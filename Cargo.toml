@@ -60,6 +60,12 @@ uuid = { version = "1", features = ["v4"] }
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = "0.9"
 
+# HTML sanitization for rich-text (bluemonday/sanitize-html equivalent)
+ammonia = "4"
+
+# Magic-byte detection for safe uploads (don't trust client MIME)
+infer = "0.16"
+
 # Logging
 tracing = "0.1"
 

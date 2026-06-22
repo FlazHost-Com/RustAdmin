@@ -28,12 +28,15 @@ pub mod migrations;
 pub mod modules;
 pub mod rbac;
 pub mod security;
+pub mod site;
 
 use config::{AppMode, Config};
 use modules::access::services::{
     IPermissionService, IRoleService, IUserService, PermissionService, RoleService, UserService,
 };
 use modules::auth::service::{AuthService, IAuthService};
+use modules::profile::service::{IProfileService, ProfileService};
+use modules::setting::services::{ISettingService, SettingService};
 use security::blacklist::{InMemoryTokenStore, TokenStore};
 use security::headers::SecurityHeaders;
 use security::method_override::MethodOverride;
@@ -72,6 +75,8 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
     let user_service: Arc<dyn IUserService> = Arc::new(UserService);
     let role_service: Arc<dyn IRoleService> = Arc::new(RoleService);
     let permission_service: Arc<dyn IPermissionService> = Arc::new(PermissionService);
+    let setting_service: Arc<dyn ISettingService> = Arc::new(SettingService);
+    let profile_service: Arc<dyn IProfileService> = Arc::new(ProfileService);
 
     let mut rocket = rocket::build()
         .manage(cfg)
@@ -80,6 +85,8 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
         .manage(user_service)
         .manage(role_service)
         .manage(permission_service)
+        .manage(setting_service)
+        .manage(profile_service)
         .attach(SecurityHeaders)
         .attach(MethodOverride)
         .mount("/", routes![healthz])
@@ -110,15 +117,34 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
         rocket = rocket
             .mount("/", routes![index])
             .mount("/admin/v1", modules::access::routes::web::routes())
+            .mount("/admin/v1", modules::setting::controllers::routes())
+            .mount("/admin/v1", modules::dashboard::controllers::routes())
+            .mount("/admin/v1", modules::components::controllers::routes())
+            .mount("/admin/v1", modules::profile::controllers::routes())
+            .mount("/admin/v1", modules::media::controllers::routes())
             .mount("/be/default", FileServer::from("static/be/default").rank(10))
             .mount("/static", FileServer::from("static").rank(11))
+            .mount("/storage", FileServer::from("storage").rank(12))
             .attach(helpers::view::template_fairing());
     }
 
-    rocket.attach(AdHoc::on_liftoff("Banner", |rocket| {
-        Box::pin(async move {
-            let rc = rocket.config();
-            info!("RustAdmin listening on {}:{}", rc.address, rc.port);
-        })
-    }))
+    rocket
+        .attach(AdHoc::on_liftoff("PrimeSetting", |rocket| {
+            Box::pin(async move {
+                if let (Some(db), Some(svc)) = (
+                    rocket.state::<DatabaseConnection>(),
+                    rocket.state::<Arc<dyn ISettingService>>(),
+                ) {
+                    if let Err(e) = svc.get(db).await {
+                        warn!("could not prime site setting cache: {e}");
+                    }
+                }
+            })
+        }))
+        .attach(AdHoc::on_liftoff("Banner", |rocket| {
+            Box::pin(async move {
+                let rc = rocket.config();
+                info!("RustAdmin listening on {}:{}", rc.address, rc.port);
+            })
+        }))
 }

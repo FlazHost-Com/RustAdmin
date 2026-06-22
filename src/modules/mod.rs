@@ -7,4 +7,9 @@
 
 pub mod access;
 pub mod auth;
+pub mod components;
+pub mod dashboard;
+pub mod home;
+pub mod media;
+pub mod profile;
 pub mod setting;

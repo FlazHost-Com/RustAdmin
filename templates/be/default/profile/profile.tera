@@ -1,0 +1,38 @@
+{% extends "layouts/be/default/main" %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold text-gray-800">Profile</h1>
+</div>
+
+<div class="tw-card p-6" style="max-width:640px">
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <img class="rounded-full" style="width:72px;height:72px;object-fit:cover" src="{{ get_file(path=data.picture) | safe }}" alt="user avatar">
+    <div><p class="fw-bold text-lg">{{ data.name }}</p><p class="text-gray-500">{{ data.email }}</p></div>
+  </div>
+  <form method="POST" action="{{ route(name='admin.v1.profile.update') | safe }}?_method=PUT&_csrf={{ csrf_token }}">
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Name</label>
+      <input type="text" class="form-control" name="name" value="{{ data.name }}">
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Email</label>
+      <input type="email" class="form-control" name="email" value="{{ data.email }}">
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Phone</label>
+      <input type="text" class="form-control" name="phone" value="{{ data.phone | default(value='') }}">
+    </div>
+    <hr class="my-4">
+    <p class="fw-semibold mb-2">Change Password <span class="text-gray-400 text-xs">(leave blank to keep)</span></p>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">New Password</label>
+      <input type="password" class="form-control" name="password" value="">
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Confirm Password</label>
+      <input type="password" class="form-control" name="password_confirmation" value="">
+    </div>
+    <button type="submit" class="btn btn-primary-tw px-4 py-2"><i class="fas fa-save me-1"></i> Save</button>
+  </form>
+</div>
+{% endblock content %}

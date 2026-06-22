@@ -1,0 +1,82 @@
+{% extends "layouts/be/default/main" %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold text-gray-800">UI Components</h1>
+</div>
+
+<!-- 1. Stat card -->
+<div class="tw-card p-5 mb-6">
+  <h2 class="text-lg fw-bold mb-3" style="color:var(--primary)">Stat Card</h2>
+  <div class="tw-card p-4" style="max-width:240px"><p class="text-gray-500 text-sm">Revenue</p><p class="text-3xl fw-bold" style="color:var(--primary)">1,248</p></div>
+</div>
+
+<!-- 2. Badges / status -->
+<div class="tw-card p-5 mb-6">
+  <h2 class="text-lg fw-bold mb-3" style="color:var(--primary)">Badges & Status</h2>
+  <span class="badge text-bg-primary">Primary</span>
+  <i class="fas fa-check-circle text-green-500 text-xl"></i>
+  <i class="fas fa-times-circle text-red-500 text-xl"></i>
+</div>
+
+<!-- 3. Alerts -->
+<div class="tw-card p-5 mb-6">
+  <h2 class="text-lg fw-bold mb-3" style="color:var(--primary)">Alerts</h2>
+  <div class="alert alert-success">Success alert</div>
+  <div class="alert alert-danger">Danger alert</div>
+  <div class="alert alert-info">Info alert</div>
+  <div class="alert alert-primary">Primary (themed) alert</div>
+</div>
+
+<!-- 4. Buttons + dropdown -->
+<div class="tw-card p-5 mb-6">
+  <h2 class="text-lg fw-bold mb-3" style="color:var(--primary)">Buttons & Dropdown</h2>
+  <button class="btn btn-primary-tw">Primary</button>
+  <button class="btn btn-success">Success</button>
+  <button class="btn btn-danger">Danger</button>
+  <div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" data-toggle-dd>Menu</button>
+    <div class="dropdown-menu"><a class="dropdown-item">Item One</a><a class="dropdown-item danger">Delete</a></div>
+  </div>
+</div>
+
+<!-- 5. Popups -->
+<div class="tw-card p-5 mb-6">
+  <h2 class="text-lg fw-bold mb-3" style="color:var(--primary)">Modal / Toast / Confirm</h2>
+  <button class="btn btn-primary-tw" onclick="Toast('Hello from Toast','success')">Toast</button>
+  <button class="btn btn-primary-tw" onclick="Modal.open({title:'Demo',body:'<p>Modal body</p>'})">Modal</button>
+  <button class="btn btn-danger" onclick="confirmDialog('Proceed?').then(function(ok){ Toast(ok?'Confirmed':'Cancelled', ok?'success':'error'); })">Confirm</button>
+</div>
+
+<!-- 6. Form + rich text -->
+<div class="tw-card p-5 mb-6">
+  <h2 class="text-lg fw-bold mb-3" style="color:var(--primary)">Form & Rich Text</h2>
+  <div class="mb-3"><label class="form-label">Text</label><input class="form-control" placeholder="Type…"></div>
+  <div class="mb-3"><label class="form-label">Rich text (+ file manager)</label><textarea class="trumbowyg-editor form-control"></textarea></div>
+</div>
+
+<!-- 7. Chart -->
+<div class="tw-card p-5 mb-6">
+  <h2 class="text-lg fw-bold mb-3" style="color:var(--primary)">Chart (themed)</h2>
+  <canvas id="demoChart" height="100"></canvas>
+</div>
+
+<!-- 8. Table + pagination -->
+<div class="tw-card p-0 overflow-hidden mb-6">
+  <div class="px-6 py-4 border-b"><h2 class="text-lg fw-bold" style="color:var(--primary)">Data Table</h2></div>
+  <div class="p-4">
+    <table class="table table-bordered table-hover"><thead><tr><th>No</th><th>Name</th><th>Status</th></tr></thead>
+      <tbody><tr><td>1</td><td>Alpha</td><td><i class="fas fa-check-circle text-green-500"></i></td></tr>
+      <tr><td>2</td><td>Beta</td><td><i class="fas fa-times-circle text-red-500"></i></td></tr></tbody></table>
+    <ul class="pagination mt-3"><li class="page-item active"><a class="page-link">1</a></li><li class="page-item"><a class="page-link">2</a></li></ul>
+  </div>
+</div>
+
+<script>
+  (function(){
+    var primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+    if (window.Chart) new Chart(document.getElementById('demoChart'), { type:'bar',
+      data:{ labels:['A','B','C','D'], datasets:[{ label:'Demo', data:[4,8,3,9], backgroundColor: primary }] },
+      options:{ plugins:{ legend:{ display:false } } } });
+  })();
+</script>
+{% endblock content %}

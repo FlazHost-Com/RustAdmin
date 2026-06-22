@@ -78,8 +78,12 @@ pub fn template_fairing() -> impl Fairing {
 /// Ensures the keys the layout chrome depends on always exist (so Tera never hits an
 /// undefined access): `themes`, `themeName`, `theme`, `app_name`, `setting`, `auth`, `nav`.
 pub fn render_view(name: &str, locals: Value, theme_name: Option<&str>) -> Template {
-    let active = theme_name.unwrap_or(DEFAULT_THEME);
-    let palette = get_theme(active);
+    // Theme precedence: explicit arg → cached site theme → default.
+    let active: String = match theme_name {
+        Some(t) => t.to_string(),
+        None => crate::site::theme_name().unwrap_or_else(|| DEFAULT_THEME.to_string()),
+    };
+    let palette = get_theme(&active);
 
     let mut ctx: Map<String, Value> = match locals {
         Value::Object(m) => m,
@@ -97,7 +101,10 @@ pub fn render_view(name: &str, locals: Value, theme_name: Option<&str>) -> Templ
     ctx.entry("themeName").or_insert_with(|| json!(active));
     ctx.entry("theme").or_insert_with(|| json!(palette));
     ctx.entry("app_name").or_insert_with(|| json!("RustAdmin"));
-    ctx.entry("setting").or_insert_with(|| json!({}));
+    // active site setting (cached) unless the caller already supplied one
+    if !ctx.contains_key("setting") {
+        ctx.insert("setting".to_string(), crate::site::setting().unwrap_or_else(|| json!({})));
+    }
     ctx.entry("auth")
         .or_insert_with(|| json!({ "name": "", "picture": null }));
     ctx.entry("nav").or_insert_with(|| {

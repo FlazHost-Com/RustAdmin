@@ -1,0 +1,68 @@
+{% extends "layouts/be/default/main" %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
+</div>
+
+<div class="row gap-4 mb-6" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem">
+  <div class="tw-card p-5">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <p class="text-gray-500 text-sm">Users</p>
+        <p class="text-3xl fw-bold" style="color:var(--primary)" data-counter>{{ stats.users }}</p>
+      </div>
+      <i class="fas fa-users text-3xl" style="color:var(--theme-light)"></i>
+    </div>
+  </div>
+  <div class="tw-card p-5">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <p class="text-gray-500 text-sm">Roles</p>
+        <p class="text-3xl fw-bold" style="color:var(--primary)" data-counter>{{ stats.roles }}</p>
+      </div>
+      <i class="fas fa-user-shield text-3xl" style="color:var(--theme-light)"></i>
+    </div>
+  </div>
+  <div class="tw-card p-5">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <p class="text-gray-500 text-sm">Permissions</p>
+        <p class="text-3xl fw-bold" style="color:var(--primary)" data-counter>{{ stats.permissions }}</p>
+      </div>
+      <i class="fas fa-key text-3xl" style="color:var(--theme-light)"></i>
+    </div>
+  </div>
+</div>
+
+<div class="row gap-4" style="display:grid;grid-template-columns:2fr 1fr;gap:1rem">
+  <div class="tw-card p-5">
+    <h2 class="text-lg fw-bold mb-4" style="color:var(--primary)">Activity</h2>
+    <canvas id="lineChart" height="120"></canvas>
+  </div>
+  <div class="tw-card p-5">
+    <h2 class="text-lg fw-bold mb-4" style="color:var(--primary)">Access Breakdown</h2>
+    <canvas id="doughnutChart" height="160"></canvas>
+  </div>
+</div>
+
+<script>
+  (function(){
+    var primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+    var secondary = getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim();
+    var dark = getComputedStyle(document.documentElement).getPropertyValue('--theme-dark').trim();
+    if (window.Chart) {
+      new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+          datasets: [{ label: 'Logins', data: [5,9,7,12,8,14,10], borderColor: primary, backgroundColor: secondary, tension: .35, fill: false }] },
+        options: { plugins: { legend: { display: false } } }
+      });
+      new Chart(document.getElementById('doughnutChart'), {
+        type: 'doughnut',
+        data: { labels: ['Users','Roles','Permissions'],
+          datasets: [{ data: [{{ stats.users }}, {{ stats.roles }}, {{ stats.permissions }}], backgroundColor: [primary, secondary, dark] }] }
+      });
+    }
+  })();
+</script>
+{% endblock content %}

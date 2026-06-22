@@ -1,0 +1,85 @@
+{% extends "layouts/be/default/main" %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold text-gray-800">Setting</h1>
+</div>
+
+<form method="POST" action="{{ route(name='admin.v1.setting.update') | safe }}?_method=PUT&_csrf={{ csrf_token }}">
+  <!-- Admin Theme -->
+  <div class="tw-card p-6 mb-6">
+    <h2 class="text-lg font-bold mb-4" style="color:var(--primary)">Admin Theme</h2>
+    <div class="d-flex flex-wrap gap-3">
+      {% for t in themes %}
+      <label class="cursor-pointer border rounded-xl p-3 {% if t.name == themeName %}ring-2{% endif %}" style="{% if t.name == themeName %}--tw-ring-color: {{ t.primary }}; border-color:{{ t.primary }}{% endif %}">
+        <input type="radio" name="theme" value="{{ t.name }}" class="form-check-input me-1" {% if t.name == themeName %}checked{% endif %}>
+        <span class="fw-semibold">{{ t.name }}</span>
+        <span class="d-flex gap-1 mt-2">
+          <span style="width:20px;height:20px;border-radius:4px;background:{{ t.primary }}"></span>
+          <span style="width:20px;height:20px;border-radius:4px;background:{{ t.secondary }}"></span>
+          <span style="width:20px;height:20px;border-radius:4px;background:{{ t.light }}"></span>
+          <span style="width:20px;height:20px;border-radius:4px;background:{{ t.dark }}"></span>
+        </span>
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Frontend Template (full catalog wired in the home/landing phase) -->
+  <div class="tw-card p-6 mb-6">
+    <h2 class="text-lg font-bold mb-4" style="color:var(--primary)">Frontend Template</h2>
+    <p class="text-gray-600 text-sm">Active template:
+      <span class="badge text-bg-primary">{{ setting.fe_template | default(value='agency-consulting-002-creative-agency') }}</span>
+    </p>
+    <input type="hidden" name="fe_template" value="{{ setting.fe_template | default(value='agency-consulting-002-creative-agency') }}">
+  </div>
+
+  <!-- Setting Form -->
+  <div class="tw-card p-6">
+    <h2 class="text-lg font-bold mb-4" style="color:var(--primary)">Site Setting</h2>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Initial</label>
+      <input type="text" class="form-control" name="initial" value="{{ setting.initial | default(value='') }}">
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Name</label>
+      <input type="text" class="form-control" name="name" value="{{ setting.name | default(value='') }}">
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Description</label>
+      <textarea class="trumbowyg-editor form-control" name="description">{{ setting.description | default(value='') }}</textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Icon</label>
+      <div class="preview mb-2"><img src="{{ get_file(path=setting.icon) | safe }}" alt="icon" style="max-width:80px"></div>
+      <input type="text" class="form-control" name="icon" value="{{ setting.icon | default(value='') }}" placeholder="image URL or storage key">
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Logo</label>
+      <div class="preview mb-2"><img src="{{ get_file(path=setting.logo) | safe }}" alt="logo" style="max-width:120px"></div>
+      <input type="text" class="form-control" name="logo" value="{{ setting.logo | default(value='') }}" placeholder="image URL or storage key">
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Login Image</label>
+      <div class="preview mb-2"><img src="{{ get_file(path=setting.login_image) | safe }}" alt="login_image" style="max-width:160px"></div>
+      <input type="text" class="form-control" name="login_image" value="{{ setting.login_image | default(value='') }}" placeholder="image URL or storage key">
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Phone</label>
+      <input type="text" class="form-control" name="phone" value="{{ setting.phone | default(value='') }}">
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Address</label>
+      <input type="text" class="form-control" name="address" value="{{ setting.address | default(value='') }}">
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Email</label>
+      <input type="email" class="form-control" name="email" value="{{ setting.email | default(value='') }}">
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Copyright</label>
+      <input type="text" class="form-control" name="copyright" value="{{ setting.copyright | default(value='') }}">
+    </div>
+    <button type="submit" class="btn btn-primary-tw px-4 py-2"><i class="fas fa-save me-1"></i> Save</button>
+  </div>
+</form>
+{% endblock content %}
