@@ -6,4 +6,5 @@
 //! guard so an API-only build (`APP_MODE=api`) drops them purely-additively.
 
 pub mod access;
+pub mod auth;
 pub mod setting;

@@ -50,6 +50,9 @@ sea-orm-migration = { version = "1.1", features = [
 ] }
 async-trait = "0.1"
 
+# Auth: JWT (HS256 pinned)
+jsonwebtoken = "9"
+
 # Password hashing + OTP randomness + ids + time
 bcrypt = "0.15"
 rand = "0.8"
@@ -65,3 +68,5 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 sea-orm = { version = "1.1", features = ["macros", "with-chrono", "with-uuid"] }
 uuid = { version = "1", features = ["v4"] }
 chrono = { version = "0.4", features = ["serde"] }
+rocket = { version = "0.5.1", features = ["json", "secrets"] }
+serde_json = "1"
