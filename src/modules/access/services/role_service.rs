@@ -62,8 +62,12 @@ pub trait IRoleService: Send + Sync {
         filter: &PermAssignFilter,
     ) -> AppResult<RolePermIndex>;
     async fn assign(&self, db: &DatabaseConnection, role_id: &str, perm_id: &str) -> AppResult<()>;
-    async fn unassign(&self, db: &DatabaseConnection, role_id: &str, perm_id: &str)
-        -> AppResult<()>;
+    async fn unassign(
+        &self,
+        db: &DatabaseConnection,
+        role_id: &str,
+        perm_id: &str,
+    ) -> AppResult<()>;
     async fn assign_selected(
         &self,
         db: &DatabaseConnection,
@@ -231,9 +235,10 @@ impl IRoleService for RoleService {
 
     async fn assign(&self, db: &DatabaseConnection, role_id: &str, perm_id: &str) -> AppResult<()> {
         self.find(db, role_id).await?;
-        let exists = roles_permissions::Entity::find_by_id((role_id.to_string(), perm_id.to_string()))
-            .one(db)
-            .await?;
+        let exists =
+            roles_permissions::Entity::find_by_id((role_id.to_string(), perm_id.to_string()))
+                .one(db)
+                .await?;
         if exists.is_none() {
             roles_permissions::ActiveModel {
                 role_id: Set(role_id.to_string()),

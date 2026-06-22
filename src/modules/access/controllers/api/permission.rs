@@ -72,7 +72,10 @@ pub async fn index(
         desc: q_desc,
     };
     let idx = svc.index(db.inner(), &filter).await?;
-    Ok((Status::Ok, Json(json!({ "success": true, "data": idx.rows, "meta": idx.meta }))))
+    Ok((
+        Status::Ok,
+        Json(json!({ "success": true, "data": idx.rows, "meta": idx.meta })),
+    ))
 }
 
 #[post("/access/permission/store", data = "<body>")]
@@ -83,7 +86,10 @@ pub async fn store(
     body: Json<PermissionBody>,
 ) -> ApiResult {
     let id = svc.store(db.inner(), to_input(body.into_inner())?).await?;
-    Ok((Status::Created, Json(json!({ "success": true, "data": { "id": id } }))))
+    Ok((
+        Status::Created,
+        Json(json!({ "success": true, "data": { "id": id } })),
+    ))
 }
 
 #[get("/access/permission/<id>/edit")]
@@ -105,8 +111,12 @@ pub async fn update(
     id: &str,
     body: Json<PermissionBody>,
 ) -> ApiResult {
-    svc.update(db.inner(), id, to_input(body.into_inner())?).await?;
-    Ok((Status::Ok, Json(json!({ "success": true, "message": "Updated" }))))
+    svc.update(db.inner(), id, to_input(body.into_inner())?)
+        .await?;
+    Ok((
+        Status::Ok,
+        Json(json!({ "success": true, "message": "Updated" })),
+    ))
 }
 
 #[delete("/access/permission/<id>/delete")]
@@ -117,7 +127,10 @@ pub async fn delete(
     id: &str,
 ) -> ApiResult {
     svc.delete(db.inner(), id).await?;
-    Ok((Status::Ok, Json(json!({ "success": true, "message": "Deleted" }))))
+    Ok((
+        Status::Ok,
+        Json(json!({ "success": true, "message": "Deleted" })),
+    ))
 }
 
 #[post("/access/permission/delete_selected", data = "<body>")]
@@ -127,6 +140,10 @@ pub async fn delete_selected(
     svc: &State<Arc<dyn IPermissionService>>,
     body: Json<SelectedBody>,
 ) -> ApiResult {
-    svc.delete_selected(db.inner(), body.into_inner().selected).await?;
-    Ok((Status::Ok, Json(json!({ "success": true, "message": "Deleted" }))))
+    svc.delete_selected(db.inner(), body.into_inner().selected)
+        .await?;
+    Ok((
+        Status::Ok,
+        Json(json!({ "success": true, "message": "Deleted" })),
+    ))
 }

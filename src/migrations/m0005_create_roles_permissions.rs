@@ -13,8 +13,16 @@ impl MigrationTrait for Migration {
                 Table::create()
                     .table(Alias::new("roles_permissions"))
                     .if_not_exists()
-                    .col(ColumnDef::new(Alias::new("role_id")).string_len(36).not_null())
-                    .col(ColumnDef::new(Alias::new("permission_id")).string_len(36).not_null())
+                    .col(
+                        ColumnDef::new(Alias::new("role_id"))
+                            .string_len(36)
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(Alias::new("permission_id"))
+                            .string_len(36)
+                            .not_null(),
+                    )
                     .primary_key(
                         Index::create()
                             .col(Alias::new("role_id"))
@@ -27,7 +35,11 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .drop_table(Table::drop().table(Alias::new("roles_permissions")).to_owned())
+            .drop_table(
+                Table::drop()
+                    .table(Alias::new("roles_permissions"))
+                    .to_owned(),
+            )
             .await
     }
 }

@@ -38,7 +38,9 @@ pub struct SelectedBody {
     pub selected: Vec<String>,
 }
 
-#[get("/access/user?<q_page>&<q_page_size>&<q_code>&<q_name>&<q_phone>&<q_email>&<q_status>&<q_role>")]
+#[get(
+    "/access/user?<q_page>&<q_page_size>&<q_code>&<q_name>&<q_phone>&<q_email>&<q_status>&<q_role>"
+)]
 #[allow(clippy::too_many_arguments)]
 pub async fn index(
     _auth: Authorized,
@@ -109,7 +111,10 @@ pub async fn update(
 ) -> ApiResult {
     let input = to_update(body.into_inner())?;
     svc.update(db.inner(), id, input).await?;
-    Ok((Status::Ok, Json(json!({ "success": true, "message": "Updated" }))))
+    Ok((
+        Status::Ok,
+        Json(json!({ "success": true, "message": "Updated" })),
+    ))
 }
 
 #[delete("/access/user/<id>/delete")]
@@ -120,7 +125,10 @@ pub async fn delete(
     id: &str,
 ) -> ApiResult {
     svc.delete(db.inner(), id).await?;
-    Ok((Status::Ok, Json(json!({ "success": true, "message": "Deleted" }))))
+    Ok((
+        Status::Ok,
+        Json(json!({ "success": true, "message": "Deleted" })),
+    ))
 }
 
 #[post("/access/user/delete_selected", data = "<body>")]
@@ -130,8 +138,12 @@ pub async fn delete_selected(
     svc: &State<Arc<dyn IUserService>>,
     body: Json<SelectedBody>,
 ) -> ApiResult {
-    svc.delete_selected(db.inner(), body.into_inner().selected).await?;
-    Ok((Status::Ok, Json(json!({ "success": true, "message": "Deleted" }))))
+    svc.delete_selected(db.inner(), body.into_inner().selected)
+        .await?;
+    Ok((
+        Status::Ok,
+        Json(json!({ "success": true, "message": "Deleted" })),
+    ))
 }
 
 fn to_store(b: UserBody) -> Result<StoreUserInput, AppError> {
@@ -140,7 +152,9 @@ fn to_store(b: UserBody) -> Result<StoreUserInput, AppError> {
     let email = req(&b.email, "email")?;
     let password = req(&b.password, "password")?;
     if password.len() < 8 {
-        return Err(AppError::validation("Password must be at least 8 characters"));
+        return Err(AppError::validation(
+            "Password must be at least 8 characters",
+        ));
     }
     Ok(StoreUserInput {
         code,

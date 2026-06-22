@@ -28,7 +28,10 @@ async fn landing_renders_bound_to_setting() {
     let body = res.into_string().await.unwrap();
     assert!(body.contains("RustAdmin"));
     assert!(body.contains("Sign in"));
-    assert!(body.contains("data-reveal"), "rich landing sections present");
+    assert!(
+        body.contains("data-reveal"),
+        "rich landing sections present"
+    );
 }
 
 #[tokio::test]

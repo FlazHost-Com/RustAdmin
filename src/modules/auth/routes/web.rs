@@ -70,7 +70,10 @@ pub async fn login_post(
     cookies: &CookieJar<'_>,
     form: Form<LoginForm>,
 ) -> Flash<Redirect> {
-    match svc.authenticate(db.inner(), &form.email, &form.password).await {
+    match svc
+        .authenticate(db.inner(), &form.email, &form.password)
+        .await
+    {
         Ok(user) => {
             set_web_session(cookies, &user.id);
             Flash::success(Redirect::to(DASHBOARD), "Welcome back")
@@ -104,9 +107,15 @@ pub async fn register_post(
     form: Form<RegisterForm>,
 ) -> Flash<Redirect> {
     if form.password.len() < 8 {
-        return Flash::error(Redirect::to("/auth/register"), "Password must be at least 8 characters");
+        return Flash::error(
+            Redirect::to("/auth/register"),
+            "Password must be at least 8 characters",
+        );
     }
-    match svc.register(db.inner(), &form.name, &form.email, &form.password).await {
+    match svc
+        .register(db.inner(), &form.name, &form.email, &form.password)
+        .await
+    {
         Ok(user) => {
             set_web_session(cookies, &user.id);
             Flash::success(Redirect::to(DASHBOARD), "Account created")
@@ -137,7 +146,10 @@ pub async fn reset_request(
             Redirect::to("/admin/v1/auth/reset/proc"),
             "An OTP has been sent (check server logs in dev)",
         ),
-        Err(e) => Flash::error(Redirect::to("/admin/v1/auth/reset/req"), e.message().to_string()),
+        Err(e) => Flash::error(
+            Redirect::to("/admin/v1/auth/reset/req"),
+            e.message().to_string(),
+        ),
     }
 }
 
@@ -159,14 +171,23 @@ pub async fn reset_process(
     form: Form<ResetProcForm>,
 ) -> Flash<Redirect> {
     if form.password.len() < 8 {
-        return Flash::error(Redirect::to("/admin/v1/auth/reset/proc"), "Password must be at least 8 characters");
+        return Flash::error(
+            Redirect::to("/admin/v1/auth/reset/proc"),
+            "Password must be at least 8 characters",
+        );
     }
     match svc
         .reset_password(db.inner(), &form.email, &form.otp, &form.password)
         .await
     {
-        Ok(_) => Flash::success(Redirect::to(LOGIN), "Password reset successful, please log in"),
-        Err(e) => Flash::error(Redirect::to("/admin/v1/auth/reset/proc"), e.message().to_string()),
+        Ok(_) => Flash::success(
+            Redirect::to(LOGIN),
+            "Password reset successful, please log in",
+        ),
+        Err(e) => Flash::error(
+            Redirect::to("/admin/v1/auth/reset/proc"),
+            e.message().to_string(),
+        ),
     }
 }
 

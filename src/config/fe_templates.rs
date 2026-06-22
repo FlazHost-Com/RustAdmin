@@ -88,10 +88,11 @@ fn parse_slug(slug: &str) -> Option<(String, String, String)> {
         return None;
     }
     // name words must be [a-z0-9]+
-    if !name_parts
-        .iter()
-        .all(|w| !w.is_empty() && w.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit()))
-    {
+    if !name_parts.iter().all(|w| {
+        !w.is_empty()
+            && w.chars()
+                .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit())
+    }) {
         return None;
     }
 

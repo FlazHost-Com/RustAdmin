@@ -14,7 +14,12 @@ impl MigrationTrait for Migration {
                 Table::create()
                     .table(Alias::new("permissions"))
                     .if_not_exists()
-                    .col(ColumnDef::new(Alias::new("id")).string_len(36).not_null().primary_key())
+                    .col(
+                        ColumnDef::new(Alias::new("id"))
+                            .string_len(36)
+                            .not_null()
+                            .primary_key(),
+                    )
                     .col(ColumnDef::new(Alias::new("name")).string().not_null())
                     .col(
                         ColumnDef::new(Alias::new("guard_name"))
@@ -30,8 +35,16 @@ impl MigrationTrait for Migration {
                             .default("Active"),
                     )
                     .col(ColumnDef::new(Alias::new("desc")).string().null())
-                    .col(ColumnDef::new(Alias::new("created_by")).string_len(36).null())
-                    .col(ColumnDef::new(Alias::new("updated_by")).string_len(36).null())
+                    .col(
+                        ColumnDef::new(Alias::new("created_by"))
+                            .string_len(36)
+                            .null(),
+                    )
+                    .col(
+                        ColumnDef::new(Alias::new("updated_by"))
+                            .string_len(36)
+                            .null(),
+                    )
                     .col(
                         ColumnDef::new(Alias::new("created_at"))
                             .timestamp()

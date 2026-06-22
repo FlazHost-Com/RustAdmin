@@ -52,7 +52,10 @@ pub async fn login(
 }
 
 #[post("/logout")]
-pub async fn logout(claims: JwtClaims, store: &State<Arc<dyn TokenStore>>) -> (Status, Json<Value>) {
+pub async fn logout(
+    claims: JwtClaims,
+    store: &State<Arc<dyn TokenStore>>,
+) -> (Status, Json<Value>) {
     store.blacklist(&claims.0.jti, claims.0.ttl_secs());
     (
         Status::Ok,

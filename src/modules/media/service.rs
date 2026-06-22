@@ -18,8 +18,7 @@ fn allowed_ext(ext: &str) -> bool {
 }
 
 fn ensure_dir() -> AppResult<()> {
-    fs::create_dir_all(EDITOR_DIR)
-        .map_err(|e| AppError::internal(format!("storage init: {e}")))
+    fs::create_dir_all(EDITOR_DIR).map_err(|e| AppError::internal(format!("storage init: {e}")))
 }
 
 /// Validate magic bytes + store the image; returns `{ name, url, key }`.

@@ -92,10 +92,7 @@ pub async fn index(
 }
 
 #[get("/access/role/create")]
-pub async fn create(
-    auth: Authorized,
-    cookies: &CookieJar<'_>,
-) -> Result<Template, AppError> {
+pub async fn create(auth: Authorized, cookies: &CookieJar<'_>) -> Result<Template, AppError> {
     let csrf = ensure_token(cookies);
     let (errors, old) = flash::take(cookies);
     let mut page = json!({ "errors": errors, "old": old });
@@ -185,7 +182,10 @@ pub async fn delete_selected(
     svc: &State<Arc<dyn IRoleService>>,
     form: Form<SelectionForm>,
 ) -> Flash<Redirect> {
-    match svc.delete_selected(db.inner(), form.into_inner().selected).await {
+    match svc
+        .delete_selected(db.inner(), form.into_inner().selected)
+        .await
+    {
         Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Selected roles deleted"),
         Err(e) => Flash::error(Redirect::to(INDEX_URL), e.message().to_string()),
     }
@@ -242,7 +242,11 @@ pub async fn permission(
         "base_query": base_query, "flash": fv(&flash),
     });
     merge(&mut page, chrome(&auth.0, &csrf, "role"));
-    Ok(render_view("be/default/access/roles/permission", page, None))
+    Ok(render_view(
+        "be/default/access/roles/permission",
+        page,
+        None,
+    ))
 }
 
 #[get("/access/role/<id>/permission/<permission_id>/assign")]
@@ -285,7 +289,10 @@ pub async fn assign_selected(
     form: Form<SelectionForm>,
 ) -> Flash<Redirect> {
     let back = format!("/admin/v1/access/role/{id}/permission");
-    match svc.assign_selected(db.inner(), id, form.into_inner().selected).await {
+    match svc
+        .assign_selected(db.inner(), id, form.into_inner().selected)
+        .await
+    {
         Ok(_) => Flash::success(Redirect::to(back), "Selected permissions assigned"),
         Err(e) => Flash::error(Redirect::to(back), e.message().to_string()),
     }
@@ -301,7 +308,10 @@ pub async fn unassign_selected(
     form: Form<SelectionForm>,
 ) -> Flash<Redirect> {
     let back = format!("/admin/v1/access/role/{id}/permission");
-    match svc.unassign_selected(db.inner(), id, form.into_inner().selected).await {
+    match svc
+        .unassign_selected(db.inner(), id, form.into_inner().selected)
+        .await
+    {
         Ok(_) => Flash::success(Redirect::to(back), "Selected permissions unassigned"),
         Err(e) => Flash::error(Redirect::to(back), e.message().to_string()),
     }

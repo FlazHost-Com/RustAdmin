@@ -19,15 +19,69 @@ pub const DEFAULT_THEME: &str = "Blue";
 
 /// The 9 palettes, in display order (matches NodeAdmin exactly).
 pub const THEMES: &[Theme] = &[
-    Theme { name: "Blue",   primary: "#3B82F6", secondary: "#60A5FA", light: "#DBEAFE", dark: "#1E40AF" },
-    Theme { name: "Black",  primary: "#374151", secondary: "#4B5563", light: "#6B7280", dark: "#1F2937" },
-    Theme { name: "Brown",  primary: "#A16207", secondary: "#D97706", light: "#FEF3C7", dark: "#78350F" },
-    Theme { name: "Green",  primary: "#10B981", secondary: "#34D399", light: "#D1FAE5", dark: "#047857" },
-    Theme { name: "Grey",   primary: "#6B7280", secondary: "#9CA3AF", light: "#E5E7EB", dark: "#374151" },
-    Theme { name: "Orange", primary: "#F59E0B", secondary: "#FBBF24", light: "#FEF3C7", dark: "#D97706" },
-    Theme { name: "Purple", primary: "#8B5CF6", secondary: "#A78BFA", light: "#F3E8FF", dark: "#6D28D9" },
-    Theme { name: "Red",    primary: "#EF4444", secondary: "#F87171", light: "#FECACA", dark: "#B91C1C" },
-    Theme { name: "Yellow", primary: "#F59E0B", secondary: "#FCD34D", light: "#FEF3C7", dark: "#D97706" },
+    Theme {
+        name: "Blue",
+        primary: "#3B82F6",
+        secondary: "#60A5FA",
+        light: "#DBEAFE",
+        dark: "#1E40AF",
+    },
+    Theme {
+        name: "Black",
+        primary: "#374151",
+        secondary: "#4B5563",
+        light: "#6B7280",
+        dark: "#1F2937",
+    },
+    Theme {
+        name: "Brown",
+        primary: "#A16207",
+        secondary: "#D97706",
+        light: "#FEF3C7",
+        dark: "#78350F",
+    },
+    Theme {
+        name: "Green",
+        primary: "#10B981",
+        secondary: "#34D399",
+        light: "#D1FAE5",
+        dark: "#047857",
+    },
+    Theme {
+        name: "Grey",
+        primary: "#6B7280",
+        secondary: "#9CA3AF",
+        light: "#E5E7EB",
+        dark: "#374151",
+    },
+    Theme {
+        name: "Orange",
+        primary: "#F59E0B",
+        secondary: "#FBBF24",
+        light: "#FEF3C7",
+        dark: "#D97706",
+    },
+    Theme {
+        name: "Purple",
+        primary: "#8B5CF6",
+        secondary: "#A78BFA",
+        light: "#F3E8FF",
+        dark: "#6D28D9",
+    },
+    Theme {
+        name: "Red",
+        primary: "#EF4444",
+        secondary: "#F87171",
+        light: "#FECACA",
+        dark: "#B91C1C",
+    },
+    Theme {
+        name: "Yellow",
+        primary: "#F59E0B",
+        secondary: "#FCD34D",
+        light: "#FEF3C7",
+        dark: "#D97706",
+    },
 ];
 
 /// All theme names in order.

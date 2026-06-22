@@ -60,7 +60,10 @@ impl UserForm {
         let pw = Self::trimmed(&self.password);
         if require_password || !pw.is_empty() {
             if pw.len() < 8 {
-                e.insert("password".into(), "Password must be at least 8 characters".into());
+                e.insert(
+                    "password".into(),
+                    "Password must be at least 8 characters".into(),
+                );
             } else if pw != Self::trimmed(&self.password_confirmation) {
                 e.insert(
                     "password_confirmation".into(),

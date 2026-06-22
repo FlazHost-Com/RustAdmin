@@ -54,7 +54,10 @@ pub async fn upload(
 #[post("/media/delete", data = "<body>")]
 pub async fn delete(_user: CurrentUser, _csrf: CsrfProtected, body: Json<DeleteBody>) -> ApiResult {
     service::delete(&body.key)?;
-    Ok((Status::Ok, Json(json!({ "success": true, "message": "Deleted" }))))
+    Ok((
+        Status::Ok,
+        Json(json!({ "success": true, "message": "Deleted" })),
+    ))
 }
 
 pub fn routes() -> Vec<rocket::Route> {

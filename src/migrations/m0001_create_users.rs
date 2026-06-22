@@ -13,15 +13,38 @@ impl MigrationTrait for Migration {
                 Table::create()
                     .table(Alias::new("users"))
                     .if_not_exists()
-                    .col(ColumnDef::new(Alias::new("id")).string_len(36).not_null().primary_key())
-                    .col(ColumnDef::new(Alias::new("code")).string_len(20).not_null().unique_key())
+                    .col(
+                        ColumnDef::new(Alias::new("id"))
+                            .string_len(36)
+                            .not_null()
+                            .primary_key(),
+                    )
+                    .col(
+                        ColumnDef::new(Alias::new("code"))
+                            .string_len(20)
+                            .not_null()
+                            .unique_key(),
+                    )
                     .col(ColumnDef::new(Alias::new("name")).string_len(50).not_null())
                     .col(ColumnDef::new(Alias::new("phone")).string_len(15).null())
-                    .col(ColumnDef::new(Alias::new("email")).string().not_null().unique_key())
-                    .col(ColumnDef::new(Alias::new("email_verified_at")).timestamp().null())
+                    .col(
+                        ColumnDef::new(Alias::new("email"))
+                            .string()
+                            .not_null()
+                            .unique_key(),
+                    )
+                    .col(
+                        ColumnDef::new(Alias::new("email_verified_at"))
+                            .timestamp()
+                            .null(),
+                    )
                     .col(ColumnDef::new(Alias::new("password")).string().not_null())
                     .col(ColumnDef::new(Alias::new("password_otp")).string().null())
-                    .col(ColumnDef::new(Alias::new("password_otp_expires")).big_integer().null())
+                    .col(
+                        ColumnDef::new(Alias::new("password_otp_expires"))
+                            .big_integer()
+                            .null(),
+                    )
                     .col(
                         ColumnDef::new(Alias::new("status"))
                             .string_len(20)
@@ -29,11 +52,29 @@ impl MigrationTrait for Migration {
                             .default("Active"),
                     )
                     .col(ColumnDef::new(Alias::new("picture")).string().null())
-                    .col(ColumnDef::new(Alias::new("blocked")).boolean().not_null().default(false))
+                    .col(
+                        ColumnDef::new(Alias::new("blocked"))
+                            .boolean()
+                            .not_null()
+                            .default(false),
+                    )
                     .col(ColumnDef::new(Alias::new("blocked_reason")).string().null())
-                    .col(ColumnDef::new(Alias::new("timezone")).string().null().default("UTC"))
-                    .col(ColumnDef::new(Alias::new("created_by")).string_len(36).null())
-                    .col(ColumnDef::new(Alias::new("updated_by")).string_len(36).null())
+                    .col(
+                        ColumnDef::new(Alias::new("timezone"))
+                            .string()
+                            .null()
+                            .default("UTC"),
+                    )
+                    .col(
+                        ColumnDef::new(Alias::new("created_by"))
+                            .string_len(36)
+                            .null(),
+                    )
+                    .col(
+                        ColumnDef::new(Alias::new("updated_by"))
+                            .string_len(36)
+                            .null(),
+                    )
                     .col(
                         ColumnDef::new(Alias::new("created_at"))
                             .timestamp()

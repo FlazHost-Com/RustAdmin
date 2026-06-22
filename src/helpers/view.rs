@@ -44,7 +44,10 @@ fn route_fn(args: &HashMap<String, TeraValue>) -> tera::Result<TeraValue> {
         if k == "name" {
             continue;
         }
-        let val = v.as_str().map(str::to_string).unwrap_or_else(|| v.to_string());
+        let val = v
+            .as_str()
+            .map(str::to_string)
+            .unwrap_or_else(|| v.to_string());
         path = path.replace(&format!("<{k}>"), &val);
     }
     Ok(TeraValue::String(path))
@@ -103,7 +106,10 @@ pub fn render_view(name: &str, locals: Value, theme_name: Option<&str>) -> Templ
     ctx.entry("app_name").or_insert_with(|| json!("RustAdmin"));
     // active site setting (cached) unless the caller already supplied one
     if !ctx.contains_key("setting") {
-        ctx.insert("setting".to_string(), crate::site::setting().unwrap_or_else(|| json!({})));
+        ctx.insert(
+            "setting".to_string(),
+            crate::site::setting().unwrap_or_else(|| json!({})),
+        );
     }
     ctx.entry("auth")
         .or_insert_with(|| json!({ "name": "", "picture": null }));

@@ -227,7 +227,10 @@ pub async fn delete_selected(
     svc: &State<Arc<dyn IUserService>>,
     form: Form<SelectionForm>,
 ) -> Flash<Redirect> {
-    match svc.delete_selected(db.inner(), form.into_inner().selected).await {
+    match svc
+        .delete_selected(db.inner(), form.into_inner().selected)
+        .await
+    {
         Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Selected users deleted"),
         Err(e) => Flash::error(Redirect::to(INDEX_URL), e.message().to_string()),
     }

@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main, bootstrap]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  lint-and-test:
+    name: lint + checker + test (sqlite)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Clippy (deny warnings)
+        run: cargo clippy --all-targets --all-features -- -D warnings
+      - name: Convention checker (gate)
+        run: cargo run --bin checker
+      - name: Tests (SQLite in-memory)
+        run: cargo test --all
+
+  db-matrix:
+    name: integration (${{ matrix.db }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        db: [mysql, postgres]
+    services:
+      mysql:
+        image: ${{ matrix.db == 'mysql' && 'mysql:8' || '' }}
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: rustadmin
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -proot" --health-interval=5s
+          --health-timeout=5s --health-retries=10
+      postgres:
+        image: ${{ matrix.db == 'postgres' && 'postgres:16' || '' }}
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rustadmin
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd="pg_isready" --health-interval=5s
+          --health-timeout=5s --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Set DATABASE_URL
+        run: |
+          if [ "${{ matrix.db }}" = "mysql" ]; then
+            echo "DATABASE_URL=mysql://root:root@127.0.0.1:3306/rustadmin" >> "$GITHUB_ENV"
+          else
+            echo "DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/rustadmin" >> "$GITHUB_ENV"
+          fi
+      - name: Migrate + smoke
+        run: |
+          cargo run --bin migrate up
+          cargo run --bin migrate status
+
+  audit:
+    name: cargo audit
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo install cargo-audit || true
+      - run: cargo audit

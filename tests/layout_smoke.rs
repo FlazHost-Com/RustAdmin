@@ -64,7 +64,10 @@ fn chrome_renders_with_theme_and_menu() {
     assert!(body.contains("/auth/logout?_csrf=tok-123"));
 
     // foot: global image fallback + vanilla Toast/Modal/Confirm
-    assert!(body.contains("imgFallback"), "global image fallback present");
+    assert!(
+        body.contains("imgFallback"),
+        "global image fallback present"
+    );
     assert!(body.contains("window.Toast"));
     assert!(body.contains("confirmDialog"));
 
@@ -79,5 +82,8 @@ fn active_menu_item_is_marked() {
     let client = client();
     let body = client.get("/__smoke").dispatch().into_string().unwrap();
     // Dashboard link should carry the `active` class
-    assert!(body.contains("font-medium active"), "active nav class applied");
+    assert!(
+        body.contains("font-medium active"),
+        "active nav class applied"
+    );
 }

@@ -63,8 +63,8 @@ async fn resolve_user_id(req: &Request<'_>, cfg: &Config) -> Result<String, Stat
     // API bearer token.
     if let Some(auth) = req.headers().get_one("Authorization") {
         if let Some(token) = auth.strip_prefix("Bearer ") {
-            let claims = jwt::verify(&cfg.jwt.secret, token.trim())
-                .map_err(|_| Status::Unauthorized)?;
+            let claims =
+                jwt::verify(&cfg.jwt.secret, token.trim()).map_err(|_| Status::Unauthorized)?;
             // blacklist check (logout invalidation)
             if let Some(store) = req.rocket().state::<Arc<dyn TokenStore>>() {
                 if store.is_blacklisted(&claims.jti) {

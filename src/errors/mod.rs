@@ -189,7 +189,10 @@ mod tests {
             Status::UnprocessableEntity
         );
         assert_eq!(AppError::unauthorized("x").status(), Status::Unauthorized);
-        assert_eq!(AppError::internal("x").status(), Status::InternalServerError);
+        assert_eq!(
+            AppError::internal("x").status(),
+            Status::InternalServerError
+        );
     }
 
     #[test]

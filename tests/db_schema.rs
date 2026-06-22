@@ -78,7 +78,9 @@ async fn permission_name_is_non_unique() {
             desc: Set(None),
             ..Default::default()
         };
-        p.insert(&conn).await.expect("insert permission (name reused)");
+        p.insert(&conn)
+            .await
+            .expect("insert permission (name reused)");
     }
 
     let count = permission::Entity::find()

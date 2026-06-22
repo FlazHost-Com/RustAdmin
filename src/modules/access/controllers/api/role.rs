@@ -11,7 +11,9 @@ use serde_json::Value;
 
 use crate::errors::AppError;
 use crate::guards::Authorized;
-use crate::modules::access::services::role_service::{IRoleService, PermAssignFilter, RoleFilter, RoleInput};
+use crate::modules::access::services::role_service::{
+    IRoleService, PermAssignFilter, RoleFilter, RoleInput,
+};
 
 type ApiResult = Result<(Status, Json<Value>), AppError>;
 
@@ -65,7 +67,10 @@ pub async fn index(
         desc: q_desc,
     };
     let idx = svc.index(db.inner(), &filter).await?;
-    Ok((Status::Ok, Json(json!({ "success": true, "data": idx.rows, "meta": idx.meta }))))
+    Ok((
+        Status::Ok,
+        Json(json!({ "success": true, "data": idx.rows, "meta": idx.meta })),
+    ))
 }
 
 #[post("/access/role/store", data = "<body>")]
@@ -76,7 +81,10 @@ pub async fn store(
     body: Json<RoleBody>,
 ) -> ApiResult {
     let id = svc.store(db.inner(), to_input(body.into_inner())?).await?;
-    Ok((Status::Created, Json(json!({ "success": true, "data": { "id": id } }))))
+    Ok((
+        Status::Created,
+        Json(json!({ "success": true, "data": { "id": id } })),
+    ))
 }
 
 #[get("/access/role/<id>/edit")]
@@ -98,8 +106,12 @@ pub async fn update(
     id: &str,
     body: Json<RoleBody>,
 ) -> ApiResult {
-    svc.update(db.inner(), id, to_input(body.into_inner())?).await?;
-    Ok((Status::Ok, Json(json!({ "success": true, "message": "Updated" }))))
+    svc.update(db.inner(), id, to_input(body.into_inner())?)
+        .await?;
+    Ok((
+        Status::Ok,
+        Json(json!({ "success": true, "message": "Updated" })),
+    ))
 }
 
 #[delete("/access/role/<id>/delete")]
@@ -110,7 +122,10 @@ pub async fn delete(
     id: &str,
 ) -> ApiResult {
     svc.delete(db.inner(), id).await?;
-    Ok((Status::Ok, Json(json!({ "success": true, "message": "Deleted" }))))
+    Ok((
+        Status::Ok,
+        Json(json!({ "success": true, "message": "Deleted" })),
+    ))
 }
 
 #[post("/access/role/delete_selected", data = "<body>")]
@@ -120,8 +135,12 @@ pub async fn delete_selected(
     svc: &State<Arc<dyn IRoleService>>,
     body: Json<SelectedBody>,
 ) -> ApiResult {
-    svc.delete_selected(db.inner(), body.into_inner().selected).await?;
-    Ok((Status::Ok, Json(json!({ "success": true, "message": "Deleted" }))))
+    svc.delete_selected(db.inner(), body.into_inner().selected)
+        .await?;
+    Ok((
+        Status::Ok,
+        Json(json!({ "success": true, "message": "Deleted" })),
+    ))
 }
 
 // ---- per-role permission management (symmetric to web) ----
@@ -162,7 +181,10 @@ pub async fn assign(
     permission_id: &str,
 ) -> ApiResult {
     svc.assign(db.inner(), id, permission_id).await?;
-    Ok((Status::Ok, Json(json!({ "success": true, "message": "Assigned" }))))
+    Ok((
+        Status::Ok,
+        Json(json!({ "success": true, "message": "Assigned" })),
+    ))
 }
 
 #[get("/access/role/<id>/permission/<permission_id>/unassign")]
@@ -174,7 +196,10 @@ pub async fn unassign(
     permission_id: &str,
 ) -> ApiResult {
     svc.unassign(db.inner(), id, permission_id).await?;
-    Ok((Status::Ok, Json(json!({ "success": true, "message": "Unassigned" }))))
+    Ok((
+        Status::Ok,
+        Json(json!({ "success": true, "message": "Unassigned" })),
+    ))
 }
 
 #[post("/access/role/<id>/permission/assign_selected", data = "<body>")]
@@ -185,8 +210,12 @@ pub async fn assign_selected(
     id: &str,
     body: Json<SelectedBody>,
 ) -> ApiResult {
-    svc.assign_selected(db.inner(), id, body.into_inner().selected).await?;
-    Ok((Status::Ok, Json(json!({ "success": true, "message": "Assigned" }))))
+    svc.assign_selected(db.inner(), id, body.into_inner().selected)
+        .await?;
+    Ok((
+        Status::Ok,
+        Json(json!({ "success": true, "message": "Assigned" })),
+    ))
 }
 
 #[post("/access/role/<id>/permission/unassign_selected", data = "<body>")]
@@ -197,6 +226,10 @@ pub async fn unassign_selected(
     id: &str,
     body: Json<SelectedBody>,
 ) -> ApiResult {
-    svc.unassign_selected(db.inner(), id, body.into_inner().selected).await?;
-    Ok((Status::Ok, Json(json!({ "success": true, "message": "Unassigned" }))))
+    svc.unassign_selected(db.inner(), id, body.into_inner().selected)
+        .await?;
+    Ok((
+        Status::Ok,
+        Json(json!({ "success": true, "message": "Unassigned" })),
+    ))
 }

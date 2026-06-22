@@ -129,16 +129,29 @@ mod tests {
             get_name_by_path_and_method("/admin/v1/access/user", "GET"),
             Some("admin.v1.access.user.index")
         );
-        assert_eq!(get_name_by_path_and_method("/", "GET"), Some("web.home.root"));
+        assert_eq!(
+            get_name_by_path_and_method("/", "GET"),
+            Some("web.home.root")
+        );
         assert_eq!(get_name_by_path_and_method("/nope/nope", "GET"), None);
     }
 
     #[test]
     fn name_and_method_are_distinct_permissions() {
         let perms = vec![("admin.v1.access.user.index".to_string(), "GET".to_string())];
-        assert!(has_access(false, &perms, "admin.v1.access.user.index", "GET"));
+        assert!(has_access(
+            false,
+            &perms,
+            "admin.v1.access.user.index",
+            "GET"
+        ));
         // has GET but not DELETE on the same name
-        assert!(!has_access(false, &perms, "admin.v1.access.user.index", "DELETE"));
+        assert!(!has_access(
+            false,
+            &perms,
+            "admin.v1.access.user.index",
+            "DELETE"
+        ));
         // administrator bypasses everything
         assert!(has_access(true, &[], "anything", "DELETE"));
     }

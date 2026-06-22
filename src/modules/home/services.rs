@@ -79,7 +79,11 @@ impl IFeCatalogService for FeCatalogService {
         let total = all.len() as u64;
         let meta = PaginationMeta::new(total, params);
         let start = ((meta.page - 1) * PER_PAGE) as usize;
-        let rows: Vec<FeTemplate> = all.into_iter().skip(start).take(PER_PAGE as usize).collect();
+        let rows: Vec<FeTemplate> = all
+            .into_iter()
+            .skip(start)
+            .take(PER_PAGE as usize)
+            .collect();
         let pages = page_window(meta.page, meta.total_pages);
         CatalogPage { rows, meta, pages }
     }

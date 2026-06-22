@@ -4,7 +4,9 @@
 use async_trait::async_trait;
 use chrono::Utc;
 use sea_orm::ActiveValue::Set;
-use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, IntoActiveModel, QueryFilter};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, IntoActiveModel, QueryFilter,
+};
 use uuid::Uuid;
 
 use crate::errors::{AppError, AppResult};
@@ -93,7 +95,10 @@ impl IAuthService for AuthService {
             return Err(AppError::conflict("Email already registered"));
         }
         let id = Uuid::new_v4().to_string();
-        let code: String = format!("{:010}", (Utc::now().timestamp_millis() % 10_000_000_000) as u64);
+        let code: String = format!(
+            "{:010}",
+            (Utc::now().timestamp_millis() % 10_000_000_000) as u64
+        );
         let hashed = bcrypt::hash(password, BCRYPT_ROUNDS)?;
         let model = user::ActiveModel {
             id: Set(id),

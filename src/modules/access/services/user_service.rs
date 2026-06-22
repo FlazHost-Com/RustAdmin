@@ -275,7 +275,11 @@ async fn resolve_roles(db: &DatabaseConnection, ids: &[String]) -> AppResult<Vec
     Ok(roles)
 }
 
-async fn link_roles(db: &DatabaseConnection, user_id: &str, roles: &[role::Model]) -> AppResult<()> {
+async fn link_roles(
+    db: &DatabaseConnection,
+    user_id: &str,
+    roles: &[role::Model],
+) -> AppResult<()> {
     for r in roles {
         users_roles::ActiveModel {
             user_id: Set(user_id.to_string()),

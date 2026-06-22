@@ -96,7 +96,11 @@ pub async fn index(
         "filter": f.as_value(), "base_query": f.base_query(), "flash": fv(&flash),
     });
     merge(&mut page, chrome(&auth.0, &csrf, "permission"));
-    Ok(render_view("be/default/access/permission/index", page, None))
+    Ok(render_view(
+        "be/default/access/permission/index",
+        page,
+        None,
+    ))
 }
 
 #[get("/access/permission/create")]
@@ -105,7 +109,11 @@ pub async fn create(auth: Authorized, cookies: &CookieJar<'_>) -> Result<Templat
     let (errors, old) = flash::take(cookies);
     let mut page = json!({ "errors": errors, "old": old });
     merge(&mut page, chrome(&auth.0, &csrf, "permission"));
-    Ok(render_view("be/default/access/permission/create", page, None))
+    Ok(render_view(
+        "be/default/access/permission/create",
+        page,
+        None,
+    ))
 }
 
 #[post("/access/permission/store", data = "<form>")]
@@ -190,7 +198,10 @@ pub async fn delete_selected(
     svc: &State<Arc<dyn IPermissionService>>,
     form: Form<SelectionForm>,
 ) -> Flash<Redirect> {
-    match svc.delete_selected(db.inner(), form.into_inner().selected).await {
+    match svc
+        .delete_selected(db.inner(), form.into_inner().selected)
+        .await
+    {
         Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Selected permissions deleted"),
         Err(e) => Flash::error(Redirect::to(INDEX_URL), e.message().to_string()),
     }

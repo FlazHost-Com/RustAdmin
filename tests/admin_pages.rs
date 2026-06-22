@@ -44,7 +44,11 @@ async fn admin_pages_render() {
         "/admin/v1/setting",
         "/admin/v1/profile",
     ] {
-        let res = client.get(path).private_cookie(uid(&admin)).dispatch().await;
+        let res = client
+            .get(path)
+            .private_cookie(uid(&admin))
+            .dispatch()
+            .await;
         assert_eq!(res.status(), Status::Ok, "{path} should render");
     }
 }
@@ -97,6 +101,10 @@ async fn profile_update_persists() {
         .dispatch()
         .await;
     assert!((300..400).contains(&res.status().code));
-    let u = user::Entity::find_by_id(admin).one(&db).await.unwrap().unwrap();
+    let u = user::Entity::find_by_id(admin)
+        .one(&db)
+        .await
+        .unwrap()
+        .unwrap();
     assert_eq!(u.name, "Renamed");
 }

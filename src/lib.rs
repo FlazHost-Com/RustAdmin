@@ -119,7 +119,10 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
             .mount("/admin/v1", modules::components::controllers::routes())
             .mount("/admin/v1", modules::profile::controllers::routes())
             .mount("/admin/v1", modules::media::controllers::routes())
-            .mount("/be/default", FileServer::from("static/be/default").rank(10))
+            .mount(
+                "/be/default",
+                FileServer::from("static/be/default").rank(10),
+            )
             .mount("/static", FileServer::from("static").rank(11))
             .mount("/storage", FileServer::from("storage").rank(12))
             .attach(helpers::view::template_fairing());

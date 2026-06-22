@@ -64,7 +64,10 @@ pub async fn update(
     }
     let pw = f.password.as_deref().unwrap_or("").trim().to_string();
     if !pw.is_empty() && pw != f.password_confirmation.as_deref().unwrap_or("").trim() {
-        return Flash::error(Redirect::to(INDEX_URL), "Password confirmation does not match");
+        return Flash::error(
+            Redirect::to(INDEX_URL),
+            "Password confirmation does not match",
+        );
     }
     let input = ProfileInput {
         name,

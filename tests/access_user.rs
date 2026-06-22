@@ -111,11 +111,17 @@ async fn web_delete_requires_method_override() {
         .private_cookie(Cookie::new("csrf_token", "tok"))
         .dispatch()
         .await;
-    assert_eq!(res.status(), Status::NotFound, "no override → no DELETE route");
+    assert_eq!(
+        res.status(),
+        Status::NotFound,
+        "no override → no DELETE route"
+    );
 
     // With ?_method=DELETE the override fairing routes to the DELETE handler.
     let res = client
-        .post(format!("/admin/v1/access/user/{admin_id2}/delete?_method=DELETE&_csrf=tok"))
+        .post(format!(
+            "/admin/v1/access/user/{admin_id2}/delete?_method=DELETE&_csrf=tok"
+        ))
         .private_cookie(Cookie::new("uid", admin_id2.clone()))
         .private_cookie(Cookie::new("csrf_token", "tok"))
         .dispatch()
@@ -180,7 +186,11 @@ async fn api_verbose_crud_and_rest_paths_404() {
         .header(bearer(&token))
         .dispatch()
         .await;
-    assert_eq!(res.status(), Status::NotFound, "REST GET /:id is not a route");
+    assert_eq!(
+        res.status(),
+        Status::NotFound,
+        "REST GET /:id is not a route"
+    );
 }
 
 #[tokio::test]

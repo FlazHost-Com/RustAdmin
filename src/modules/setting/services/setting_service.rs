@@ -33,18 +33,17 @@ pub trait ISettingService: Send + Sync {
     /// Load the singleton (creating defaults if missing) and refresh the global cache.
     async fn get(&self, db: &sea_orm::DatabaseConnection) -> AppResult<setting::Model>;
     /// Update the singleton (sanitizing rich-text `description`) and refresh the cache.
-    async fn update(
-        &self,
-        db: &sea_orm::DatabaseConnection,
-        input: SettingInput,
-    ) -> AppResult<()>;
+    async fn update(&self, db: &sea_orm::DatabaseConnection, input: SettingInput) -> AppResult<()>;
 }
 
 pub struct SettingService;
 
 impl SettingService {
     fn recache(model: &setting::Model) {
-        let theme = model.theme.clone().unwrap_or_else(|| DEFAULT_THEME.to_string());
+        let theme = model
+            .theme
+            .clone()
+            .unwrap_or_else(|| DEFAULT_THEME.to_string());
         let value = serde_json::to_value(model).unwrap_or_else(|_| json!({}));
         crate::site::set(theme, value);
     }
@@ -71,11 +70,7 @@ impl ISettingService for SettingService {
         Ok(model)
     }
 
-    async fn update(
-        &self,
-        db: &sea_orm::DatabaseConnection,
-        input: SettingInput,
-    ) -> AppResult<()> {
+    async fn update(&self, db: &sea_orm::DatabaseConnection, input: SettingInput) -> AppResult<()> {
         let current = self.get(db).await?;
         let mut am = current.into_active_model();
         am.initial = Set(input.initial);

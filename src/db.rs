@@ -12,11 +12,20 @@ use crate::config::Config;
 
 /// Connect using the configured DSN + pool settings.
 pub async fn connect(cfg: &Config) -> Result<DatabaseConnection, DbErr> {
-    connect_url(&cfg.db.connection_url(), cfg.db.connection_limit, cfg.db.logging).await
+    connect_url(
+        &cfg.db.connection_url(),
+        cfg.db.connection_limit,
+        cfg.db.logging,
+    )
+    .await
 }
 
 /// Connect to an explicit URL (used by tests, e.g. `sqlite::memory:`).
-pub async fn connect_url(url: &str, max_conn: u32, logging: bool) -> Result<DatabaseConnection, DbErr> {
+pub async fn connect_url(
+    url: &str,
+    max_conn: u32,
+    logging: bool,
+) -> Result<DatabaseConnection, DbErr> {
     let mut opt = ConnectOptions::new(url.to_owned());
     opt.max_connections(max_conn.max(1))
         .min_connections(1)

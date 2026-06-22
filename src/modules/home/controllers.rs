@@ -24,7 +24,11 @@ pub enum Landing {
 
 fn active_slug() -> String {
     crate::site::setting()
-        .and_then(|s| s.get("fe_template").and_then(|v| v.as_str()).map(str::to_string))
+        .and_then(|s| {
+            s.get("fe_template")
+                .and_then(|v| v.as_str())
+                .map(str::to_string)
+        })
         .unwrap_or_else(|| DEFAULT_FE_TEMPLATE.to_string())
 }
 
@@ -32,7 +36,11 @@ async fn render_landing(catalog: &Arc<dyn IFeCatalogService>) -> Result<Landing,
     let slug = active_slug();
     if slug == DEFAULT_FE_TEMPLATE {
         // native rich landing; render_view injects the cached `setting`
-        Ok(Landing::Native(render_view("fe/default/index", json!({}), None)))
+        Ok(Landing::Native(render_view(
+            "fe/default/index",
+            json!({}),
+            None,
+        )))
     } else {
         Ok(Landing::Raw(RawHtml(catalog.preview_html(&slug)?)))
     }
