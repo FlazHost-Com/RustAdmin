@@ -2,4 +2,6 @@
 //! web (NOT REST): `/store`, `/<id>/edit`, `/<id>/update` (PUT), `/<id>/delete` (DELETE),
 //! `/delete_selected`.
 
+pub mod permission;
+pub mod role;
 pub mod user;

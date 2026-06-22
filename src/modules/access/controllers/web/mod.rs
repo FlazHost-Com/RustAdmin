@@ -1,5 +1,7 @@
 //! Web (admin UI) controllers for the access module.
 
+pub mod permission;
+pub mod role;
 pub mod user;
 
 use serde_json::{json, Map, Value};

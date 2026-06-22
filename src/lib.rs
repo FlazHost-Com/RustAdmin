@@ -30,7 +30,9 @@ pub mod rbac;
 pub mod security;
 
 use config::{AppMode, Config};
-use modules::access::services::{IUserService, UserService};
+use modules::access::services::{
+    IPermissionService, IRoleService, IUserService, PermissionService, RoleService, UserService,
+};
 use modules::auth::service::{AuthService, IAuthService};
 use security::blacklist::{InMemoryTokenStore, TokenStore};
 use security::headers::SecurityHeaders;
@@ -68,12 +70,16 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
     let token_store: Arc<dyn TokenStore> = Arc::new(InMemoryTokenStore::new());
     let auth_service: Arc<dyn IAuthService> = Arc::new(AuthService);
     let user_service: Arc<dyn IUserService> = Arc::new(UserService);
+    let role_service: Arc<dyn IRoleService> = Arc::new(RoleService);
+    let permission_service: Arc<dyn IPermissionService> = Arc::new(PermissionService);
 
     let mut rocket = rocket::build()
         .manage(cfg)
         .manage(token_store)
         .manage(auth_service)
         .manage(user_service)
+        .manage(role_service)
+        .manage(permission_service)
         .attach(SecurityHeaders)
         .attach(MethodOverride)
         .mount("/", routes![healthz])
