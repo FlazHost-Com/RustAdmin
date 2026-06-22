@@ -1,3 +1,4 @@
-//! Auth routes (api now; web in a later phase).
+//! Auth routes — api (JWT) + web (session, register, reset).
 
 pub mod api;
+pub mod web;

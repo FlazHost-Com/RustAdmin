@@ -24,13 +24,43 @@
     </div>
   </div>
 
-  <!-- Frontend Template (full catalog wired in the home/landing phase) -->
+  <!-- Frontend Template switcher (folded into Setting; selection saved via this form) -->
   <div class="tw-card p-6 mb-6">
-    <h2 class="text-lg font-bold mb-4" style="color:var(--primary)">Frontend Template</h2>
-    <p class="text-gray-600 text-sm">Active template:
-      <span class="badge text-bg-primary">{{ setting.fe_template | default(value='agency-consulting-002-creative-agency') }}</span>
-    </p>
-    <input type="hidden" name="fe_template" value="{{ setting.fe_template | default(value='agency-consulting-002-creative-agency') }}">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <h2 class="text-lg font-bold" style="color:var(--primary)">Frontend Template</h2>
+      <span class="text-sm text-gray-500">Active: <span class="badge text-bg-primary" id="fe-active-label">{{ fe_active }}</span></span>
+    </div>
+    <!-- search is a SEPARATE GET form so it never submits the main POST -->
+    <input type="hidden" name="fe_template" id="fe_template_input" value="{{ fe_active }}">
+    <div class="mb-4 d-flex gap-2">
+      <input type="text" form="fe_search_form" name="fe_search" value="{{ fe_search }}" class="form-control" placeholder="Search templates…" style="max-width:280px">
+      <button type="submit" form="fe_search_form" class="btn btn-sm btn-success">Search</button>
+    </div>
+
+    <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem">
+      {% for t in fe_catalog %}
+      <div class="border rounded-xl overflow-hidden fe-card" data-slug="{{ t.slug }}">
+        <div class="fe-thumb" data-slug="{{ t.slug }}" style="position:relative;height:150px;overflow:hidden;background:#f8fafc;cursor:pointer"></div>
+        <div class="p-2 d-flex align-items-center justify-content-between">
+          <span class="text-xs truncate" title="{{ t.slug }}">{{ t.name }}</span>
+          <button type="button" class="btn btn-sm fe-pick {% if t.slug == fe_active %}btn-primary-tw{% else %}btn-success{% endif %}" data-slug="{{ t.slug }}">
+            {% if t.slug == fe_active %}SELECTED{% else %}SELECT{% endif %}
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="d-flex justify-content-end mt-4">
+      <ul class="pagination">
+        {% if fe_meta.has_prev %}<li class="page-item"><a class="page-link" href="?fe_page={{ fe_meta.page - 1 }}&fe_search={{ fe_search }}">Previous</a></li>{% endif %}
+        {% for p in fe_pages %}
+          {% if p %}<li class="page-item {% if p == fe_meta.page %}active{% endif %}"><a class="page-link" href="?fe_page={{ p }}&fe_search={{ fe_search }}">{{ p }}</a></li>
+          {% else %}<li class="page-item"><span class="page-link">…</span></li>{% endif %}
+        {% endfor %}
+        {% if fe_meta.has_next %}<li class="page-item"><a class="page-link" href="?fe_page={{ fe_meta.page + 1 }}&fe_search={{ fe_search }}">Next</a></li>{% endif %}
+      </ul>
+    </div>
   </div>
 
   <!-- Setting Form -->
@@ -82,4 +112,76 @@
     <button type="submit" class="btn btn-primary-tw px-4 py-2"><i class="fas fa-save me-1"></i> Save</button>
   </div>
 </form>
+
+<!-- separate GET form for catalog search (does not submit the main POST) -->
+<form id="fe_search_form" method="get" action="{{ route(name='admin.v1.setting.index') | safe }}" style="display:none"></form>
+
+<script>
+(function(){
+  var CARD_W = 220, BASE_W = 1280;
+  function previewUrl(slug){ return '/admin/v1/setting/fe-preview/' + encodeURIComponent(slug); }
+
+  function loadThumb(el){
+    var slug = el.getAttribute('data-slug');
+    var cacheKey = 'fe_prev_' + slug;
+    function render(html){
+      var scale = CARD_W / BASE_W;
+      var iframe = document.createElement('iframe');
+      iframe.setAttribute('sandbox','allow-scripts');
+      iframe.style.cssText = 'width:'+BASE_W+'px;height:'+(150/scale)+'px;border:0;transform:scale('+scale+');transform-origin:top left;pointer-events:none';
+      iframe.srcdoc = html;
+      el.innerHTML = ''; el.appendChild(iframe);
+    }
+    var cached = null;
+    try { cached = localStorage.getItem(cacheKey); } catch(e){}
+    if (cached) { render(cached); return; }
+    fetch(previewUrl(slug), { credentials:'same-origin' })
+      .then(function(r){ return r.text(); })
+      .then(function(html){ try { localStorage.setItem(cacheKey, html); } catch(e){} render(html); })
+      .catch(function(){ el.innerHTML = '<div class="d-flex align-items-center justify-content-center" style="height:100%;color:#94a3b8"><i class="fas fa-image"></i></div>'; });
+  }
+
+  var thumbs = document.querySelectorAll('.fe-thumb');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if (e.isIntersecting){ loadThumb(e.target); io.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    thumbs.forEach(function(t){ io.observe(t); });
+  } else {
+    thumbs.forEach(loadThumb);
+  }
+
+  // click thumbnail → full preview modal
+  document.querySelectorAll('.fe-thumb').forEach(function(el){
+    el.addEventListener('click', function(){
+      var slug = el.getAttribute('data-slug');
+      var html = null; try { html = localStorage.getItem('fe_prev_' + slug); } catch(e){}
+      var body = '<iframe sandbox="allow-scripts" style="width:100%;height:60vh;border:0" srcdoc="'+ (html||'').replace(/"/g,'&quot;') +'"></iframe>';
+      if (window.Modal) Modal.open({ title: slug, body: body, buttons: [{label:'Close'}] });
+    });
+  });
+
+  // select a template → set hidden input (persist), update buttons (slug saved with main Save)
+  function select(slug){
+    var input = document.getElementById('fe_template_input');
+    if (input) input.value = slug;
+    try { localStorage.setItem('fe_selected', slug); } catch(e){}
+    var label = document.getElementById('fe-active-label'); if (label) label.textContent = slug;
+    document.querySelectorAll('.fe-pick').forEach(function(b){
+      var on = b.getAttribute('data-slug') === slug;
+      b.classList.toggle('btn-primary-tw', on);
+      b.classList.toggle('btn-success', !on);
+      b.textContent = on ? 'SELECTED' : 'SELECT';
+    });
+  }
+  document.querySelectorAll('.fe-pick').forEach(function(b){
+    b.addEventListener('click', function(){ select(b.getAttribute('data-slug')); });
+  });
+  // restore prior selection across catalog page changes
+  try { var sel = localStorage.getItem('fe_selected'); if (sel) {
+    var input = document.getElementById('fe_template_input'); if (input) input.value = sel;
+    var label = document.getElementById('fe-active-label'); if (label) label.textContent = sel;
+  } } catch(e){}
+})();
+</script>
 {% endblock content %}

@@ -5,15 +5,18 @@ use std::sync::Arc;
 use rocket::form::Form;
 use rocket::http::CookieJar;
 use rocket::request::FlashMessage;
+use rocket::response::content::RawHtml;
 use rocket::response::{Flash, Redirect};
 use rocket::State;
 use rocket_dyn_templates::Template;
 use sea_orm::DatabaseConnection;
 use serde_json::{json, Value};
 
+use crate::config::fe_templates::DEFAULT_FE_TEMPLATE;
 use crate::errors::AppError;
 use crate::guards::Authorized;
 use crate::helpers::view::{nav_for, render_view};
+use crate::modules::home::services::IFeCatalogService;
 use crate::modules::setting::services::{ISettingService, SettingInput};
 use crate::security::csrf::{ensure_token, CsrfProtected};
 
@@ -63,13 +66,17 @@ impl From<SettingForm> for SettingInput {
     }
 }
 
-#[get("/setting")]
+#[get("/setting?<fe_page>&<fe_search>")]
+#[allow(clippy::too_many_arguments)]
 pub async fn index(
     auth: Authorized,
     db: &State<DatabaseConnection>,
     svc: &State<Arc<dyn ISettingService>>,
+    catalog: &State<Arc<dyn IFeCatalogService>>,
     cookies: &CookieJar<'_>,
     flash: Option<FlashMessage<'_>>,
+    fe_page: Option<u64>,
+    fe_search: Option<String>,
 ) -> Result<Template, AppError> {
     let setting = svc.get(db.inner()).await?;
     let csrf = ensure_token(cookies);
@@ -77,7 +84,20 @@ pub async fn index(
         Some(m) => json!({ "key": m.kind(), "message": m.message() }),
         None => json!({}),
     };
-    let mut page = json!({ "setting": setting, "flash": flash_v });
+    let active = setting
+        .fe_template
+        .clone()
+        .unwrap_or_else(|| DEFAULT_FE_TEMPLATE.to_string());
+    let cat = catalog.paginate(fe_search.as_deref(), None, fe_page, &active);
+    let mut page = json!({
+        "setting": setting,
+        "flash": flash_v,
+        "fe_catalog": cat.rows,
+        "fe_meta": cat.meta,
+        "fe_pages": cat.pages,
+        "fe_active": active,
+        "fe_search": fe_search.unwrap_or_default(),
+    });
     // merge chrome
     if let (Value::Object(b), Value::Object(c)) = (&mut page, chrome(&auth.0, &csrf)) {
         for (k, v) in c {
@@ -101,6 +121,16 @@ pub async fn update(
     }
 }
 
+/// Proxy a frontend-template preview (anti-SSRF; namespace `setting`, NOT a separate module).
+#[get("/setting/fe-preview/<slug>")]
+pub async fn fe_preview(
+    _auth: Authorized,
+    catalog: &State<Arc<dyn IFeCatalogService>>,
+    slug: &str,
+) -> Result<RawHtml<String>, AppError> {
+    Ok(RawHtml(catalog.preview_html(slug)?))
+}
+
 pub fn routes() -> Vec<rocket::Route> {
-    routes![index, update]
+    routes![index, update, fe_preview]
 }

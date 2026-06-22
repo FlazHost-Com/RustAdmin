@@ -16,7 +16,6 @@ use std::sync::Arc;
 use rocket::fairing::AdHoc;
 use rocket::fs::FileServer;
 use rocket::{Build, Rocket};
-use rocket_dyn_templates::{context, Template};
 use sea_orm::DatabaseConnection;
 
 pub mod config;
@@ -35,6 +34,7 @@ use modules::access::services::{
     IPermissionService, IRoleService, IUserService, PermissionService, RoleService, UserService,
 };
 use modules::auth::service::{AuthService, IAuthService};
+use modules::home::{FeCatalogService, IFeCatalogService};
 use modules::profile::service::{IProfileService, ProfileService};
 use modules::setting::services::{ISettingService, SettingService};
 use security::blacklist::{InMemoryTokenStore, TokenStore};
@@ -45,12 +45,6 @@ use security::method_override::MethodOverride;
 #[get("/healthz")]
 fn healthz() -> &'static str {
     "ok"
-}
-
-/// Temporary placeholder home (replaced by the `home` module in a later phase).
-#[get("/")]
-fn index() -> Template {
-    Template::render("placeholder", context! { app_name: "RustAdmin" })
 }
 
 /// Build the Rocket instance from the environment, connecting the DB on ignite.
@@ -77,6 +71,7 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
     let permission_service: Arc<dyn IPermissionService> = Arc::new(PermissionService);
     let setting_service: Arc<dyn ISettingService> = Arc::new(SettingService);
     let profile_service: Arc<dyn IProfileService> = Arc::new(ProfileService);
+    let fe_catalog: Arc<dyn IFeCatalogService> = Arc::new(FeCatalogService);
 
     let mut rocket = rocket::build()
         .manage(cfg)
@@ -87,6 +82,7 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
         .manage(permission_service)
         .manage(setting_service)
         .manage(profile_service)
+        .manage(fe_catalog)
         .attach(SecurityHeaders)
         .attach(MethodOverride)
         .mount("/", routes![healthz])
@@ -115,7 +111,8 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
     // Web-only layer (skipped purely-additively in API-only mode).
     if mode == AppMode::Full {
         rocket = rocket
-            .mount("/", routes![index])
+            .mount("/", modules::home::controllers::routes())
+            .mount("/", modules::auth::routes::web::routes())
             .mount("/admin/v1", modules::access::routes::web::routes())
             .mount("/admin/v1", modules::setting::controllers::routes())
             .mount("/admin/v1", modules::dashboard::controllers::routes())
