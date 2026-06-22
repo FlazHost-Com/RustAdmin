@@ -98,13 +98,24 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
         None => {
             rocket = rocket.attach(AdHoc::try_on_ignite("Database", |rocket| async move {
                 let cfg = rocket.state::<Config>().expect("config managed").clone();
-                match db::connect(&cfg).await {
-                    Ok(conn) => Ok(rocket.manage(conn)),
+                let conn = match db::connect(&cfg).await {
+                    Ok(conn) => conn,
                     Err(e) => {
                         error!("database connection failed: {e}");
-                        Err(rocket)
+                        return Err(rocket);
                     }
+                };
+                // Auto-migrate in dev so `cargo run` is self-bootstrapping (idempotent).
+                // In production run `cargo run --bin migrate up` explicitly.
+                if !cfg.is_prod {
+                    use sea_orm_migration::MigratorTrait;
+                    if let Err(e) = migrations::Migrator::up(&conn, None).await {
+                        error!("auto-migration failed: {e}");
+                        return Err(rocket);
+                    }
+                    info!("database migrated (dev auto-migrate)");
                 }
+                Ok(rocket.manage(conn))
             }));
         }
     }
