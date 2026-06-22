@@ -30,6 +30,7 @@ pub mod rbac;
 pub mod security;
 
 use config::{AppMode, Config};
+use modules::access::services::{IUserService, UserService};
 use modules::auth::service::{AuthService, IAuthService};
 use security::blacklist::{InMemoryTokenStore, TokenStore};
 use security::headers::SecurityHeaders;
@@ -66,15 +67,18 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
     // DI container ≈ Rocket managed state. Services are shared as trait objects.
     let token_store: Arc<dyn TokenStore> = Arc::new(InMemoryTokenStore::new());
     let auth_service: Arc<dyn IAuthService> = Arc::new(AuthService);
+    let user_service: Arc<dyn IUserService> = Arc::new(UserService);
 
     let mut rocket = rocket::build()
         .manage(cfg)
         .manage(token_store)
         .manage(auth_service)
+        .manage(user_service)
         .attach(SecurityHeaders)
         .attach(MethodOverride)
         .mount("/", routes![healthz])
-        .mount("/api/v1/auth", modules::auth::routes::api::routes());
+        .mount("/api/v1/auth", modules::auth::routes::api::routes())
+        .mount("/api/v1", modules::access::routes::api::routes());
 
     // DB: inject (tests) or connect on ignite (server).
     match db {
@@ -99,6 +103,7 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
     if mode == AppMode::Full {
         rocket = rocket
             .mount("/", routes![index])
+            .mount("/admin/v1", modules::access::routes::web::routes())
             .mount("/be/default", FileServer::from("static/be/default").rank(10))
             .mount("/static", FileServer::from("static").rank(11))
             .attach(helpers::view::template_fairing());

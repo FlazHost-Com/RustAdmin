@@ -8,6 +8,7 @@
 //! - [`forms`] — query/body cleanup (strip empty filter fields).
 
 pub mod ci_like;
+pub mod flash;
 pub mod forms;
 pub mod otp;
 pub mod pagination;

@@ -1,5 +1,10 @@
 //! `access` module — User / Role / Permission (RBAC). Reference module for the full
-//! pattern (services, validators, web+api controllers, canonical tables) — filled in Phase 5.
+//! pattern: services (trait + impl), validators, web+api controllers, named method-aware
+//! routes, and canonical index tables.
 
 pub mod context;
+pub mod controllers;
 pub mod models;
+pub mod routes;
+pub mod services;
+pub mod validators;

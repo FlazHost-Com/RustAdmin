@@ -10,11 +10,23 @@ use rocket_dyn_templates::Template;
 use serde_json::{json, Map, Value};
 
 use crate::config::themes::{get_theme, theme_names, DEFAULT_THEME, THEMES};
-use crate::rbac::registry;
+use crate::rbac::{has_access, registry};
 
 /// All palettes as JSON (for the theme switcher swatches).
 pub fn themes_json() -> Value {
     json!(THEMES)
+}
+
+/// Sidebar gating object (`nav.*`) computed from the current user's RBAC perms.
+pub fn nav_for(is_admin: bool, perms: &[(String, String)]) -> Value {
+    let can = |name: &str| has_access(is_admin, perms, name, "GET");
+    json!({
+        "components": can("admin.v1.components.index"),
+        "permission": can("admin.v1.access.permission.index"),
+        "role": can("admin.v1.access.role.index"),
+        "user": can("admin.v1.access.user.index"),
+        "setting": can("admin.v1.setting.index"),
+    })
 }
 
 /// Tera function `route(name=..., <param>=...)` → the registry path with `<param>` filled.
@@ -99,6 +111,10 @@ pub fn render_view(name: &str, locals: Value, theme_name: Option<&str>) -> Templ
     ctx.entry("active").or_insert_with(|| json!(""));
     // flash: { key, message } — default empty so templates can check `flash.message`.
     ctx.entry("flash").or_insert_with(|| json!({}));
+    // inline form state (PRG): errors (field→msg) + old (field→value).
+    ctx.entry("errors").or_insert_with(|| json!({}));
+    ctx.entry("old").or_insert_with(|| json!({}));
+    ctx.entry("filter").or_insert_with(|| json!({}));
 
     Template::render(name.to_string(), Value::Object(ctx))
 }
