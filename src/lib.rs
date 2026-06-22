@@ -14,6 +14,7 @@ extern crate rocket;
 use std::sync::Arc;
 
 use rocket::fairing::AdHoc;
+use rocket::fs::FileServer;
 use rocket::{Build, Rocket};
 use rocket_dyn_templates::{context, Template};
 use sea_orm::DatabaseConnection;
@@ -96,7 +97,11 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
 
     // Web-only layer (skipped purely-additively in API-only mode).
     if mode == AppMode::Full {
-        rocket = rocket.mount("/", routes![index]).attach(Template::fairing());
+        rocket = rocket
+            .mount("/", routes![index])
+            .mount("/be/default", FileServer::from("static/be/default").rank(10))
+            .mount("/static", FileServer::from("static").rank(11))
+            .attach(helpers::view::template_fairing());
     }
 
     rocket.attach(AdHoc::on_liftoff("Banner", |rocket| {

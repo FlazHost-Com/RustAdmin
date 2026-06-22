@@ -69,4 +69,5 @@ sea-orm = { version = "1.1", features = ["macros", "with-chrono", "with-uuid"] }
 uuid = { version = "1", features = ["v4"] }
 chrono = { version = "0.4", features = ["serde"] }
 rocket = { version = "0.5.1", features = ["json", "secrets"] }
+rocket_dyn_templates = { version = "0.2.0", features = ["tera"] }
 serde_json = "1"

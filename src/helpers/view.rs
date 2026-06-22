@@ -1,24 +1,70 @@
-//! Tera rendering helper (mirrors NodeAdmin `renderView()` in `utils/view.ts`).
-//!
-//! Every admin render injects the theme locals (`theme`, `themeName`, `themes`) so the
-//! layout chrome can map them to CSS variables + the inline Tailwind config — switching
-//! theme changes the whole UI without a rebuild. The `setting` local is layered in once the
-//! Setting module exists (Phase 6).
+//! Tera rendering helper (mirrors NodeAdmin `renderView()` + `route()`/`getFile()` view
+//! globals). Every admin render injects theme + setting/auth/nav locals so the chrome can map
+//! them to CSS variables and gate the sidebar — switching theme restyles the whole UI.
 
+use std::collections::HashMap;
+
+use rocket::fairing::Fairing;
+use rocket_dyn_templates::tera::{self, Tera, Value as TeraValue};
 use rocket_dyn_templates::Template;
 use serde_json::{json, Map, Value};
 
-use crate::config::themes::{get_theme, DEFAULT_THEME, THEMES};
+use crate::config::themes::{get_theme, theme_names, DEFAULT_THEME, THEMES};
+use crate::rbac::registry;
 
 /// All palettes as JSON (for the theme switcher swatches).
 pub fn themes_json() -> Value {
     json!(THEMES)
 }
 
-/// Render a backend template, merging the standard theme locals into `locals`.
+/// Tera function `route(name=..., <param>=...)` → the registry path with `<param>` filled.
+fn route_fn(args: &HashMap<String, TeraValue>) -> tera::Result<TeraValue> {
+    let name = args
+        .get("name")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| tera::Error::msg("route(): missing `name`"))?;
+    let entry = registry().into_iter().find(|r| r.name == name);
+    let mut path = match entry {
+        Some(e) => e.path.to_string(),
+        None => return Err(tera::Error::msg(format!("route(): unknown route `{name}`"))),
+    };
+    for (k, v) in args {
+        if k == "name" {
+            continue;
+        }
+        let val = v.as_str().map(str::to_string).unwrap_or_else(|| v.to_string());
+        path = path.replace(&format!("<{k}>"), &val);
+    }
+    Ok(TeraValue::String(path))
+}
+
+/// Tera function `get_file(path=...)` → resolved asset URL (identity for now; storage/OSS
+/// mapping plugs in here later). Returns empty string for null/missing.
+fn get_file_fn(args: &HashMap<String, TeraValue>) -> tera::Result<TeraValue> {
+    let path = args.get("path").and_then(|v| v.as_str()).unwrap_or("");
+    Ok(TeraValue::String(path.to_string()))
+}
+
+/// Register RustAdmin's Tera globals. Shared by the live engine and tests.
+pub fn register_tera(tera: &mut Tera) {
+    // Autoescape `.tera` output by default (EJS `<%= %>` parity); use `| safe` for raw HTML
+    // (EJS `<%- %>`), e.g. sanitized rich-text descriptions.
+    tera.autoescape_on(vec![".tera", ".html", ".htm"]);
+    tera.register_function("route", route_fn);
+    tera.register_function("get_file", get_file_fn);
+}
+
+/// The Template fairing with RustAdmin's Tera customizations attached.
+pub fn template_fairing() -> impl Fairing {
+    Template::custom(|engines| {
+        register_tera(&mut engines.tera);
+    })
+}
+
+/// Render a backend template, merging standard theme + chrome locals into `locals`.
 ///
-/// `locals` must be a JSON object; the active theme is resolved from `theme_name`
-/// (falling back to the default).
+/// Ensures the keys the layout chrome depends on always exist (so Tera never hits an
+/// undefined access): `themes`, `themeName`, `theme`, `app_name`, `setting`, `auth`, `nav`.
 pub fn render_view(name: &str, locals: Value, theme_name: Option<&str>) -> Template {
     let active = theme_name.unwrap_or(DEFAULT_THEME);
     let palette = get_theme(active);
@@ -34,9 +80,25 @@ pub fn render_view(name: &str, locals: Value, theme_name: Option<&str>) -> Templ
     };
 
     ctx.entry("themes").or_insert_with(themes_json);
-    ctx.entry("themeName")
-        .or_insert_with(|| json!(active));
+    ctx.entry("themeNames")
+        .or_insert_with(|| json!(theme_names()));
+    ctx.entry("themeName").or_insert_with(|| json!(active));
     ctx.entry("theme").or_insert_with(|| json!(palette));
+    ctx.entry("app_name").or_insert_with(|| json!("RustAdmin"));
+    ctx.entry("setting").or_insert_with(|| json!({}));
+    ctx.entry("auth")
+        .or_insert_with(|| json!({ "name": "", "picture": null }));
+    ctx.entry("nav").or_insert_with(|| {
+        json!({
+            "components": false, "permission": false, "role": false,
+            "user": false, "setting": false, "maintenance": false
+        })
+    });
+    ctx.entry("active_path").or_insert_with(|| json!(""));
+    // active sidebar key: "dashboard"|"components"|"permission"|"role"|"user"|"setting"
+    ctx.entry("active").or_insert_with(|| json!(""));
+    // flash: { key, message } — default empty so templates can check `flash.message`.
+    ctx.entry("flash").or_insert_with(|| json!({}));
 
     Template::render(name.to_string(), Value::Object(ctx))
 }
