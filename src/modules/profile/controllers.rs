@@ -22,11 +22,28 @@ const INDEX_URL: &str = "/admin/v1/profile";
 
 #[derive(rocket::FromForm, Debug, Default)]
 pub struct ProfileForm {
+    pub code: Option<String>,
     pub name: Option<String>,
     pub email: Option<String>,
     pub phone: Option<String>,
+    pub timezone: Option<String>,
+    pub status: Option<String>,
     pub password: Option<String>,
     pub password_confirmation: Option<String>,
+}
+
+/// Timezone options for the profile form (matches the user form).
+fn timezones() -> Vec<&'static str> {
+    vec![
+        "UTC",
+        "Asia/Jakarta",
+        "Asia/Singapore",
+        "Asia/Tokyo",
+        "Europe/London",
+        "Europe/Paris",
+        "America/New_York",
+        "America/Los_Angeles",
+    ]
 }
 
 #[get("/profile")]
@@ -43,7 +60,7 @@ pub async fn index(
         Some(m) => json!({ "key": m.kind(), "message": m.message() }),
         None => json!({}),
     };
-    let mut page = json!({ "data": data, "flash": flash_v });
+    let mut page = json!({ "data": data, "flash": flash_v, "timezones": timezones() });
     merge(&mut page, chrome(&user, &csrf, ""));
     Ok(render_view("be/default/profile/profile", page, None))
 }
@@ -70,9 +87,12 @@ pub async fn update(
         );
     }
     let input = ProfileInput {
+        code: f.code.filter(|c| !c.trim().is_empty()),
         name,
         email,
         phone: f.phone.filter(|p| !p.trim().is_empty()),
+        timezone: f.timezone.filter(|t| !t.trim().is_empty()),
+        status: f.status.filter(|s| !s.trim().is_empty()),
         password: if pw.is_empty() { None } else { Some(pw) },
     };
     match svc.update(db.inner(), &user.id, input).await {

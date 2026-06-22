@@ -38,18 +38,60 @@ fn uid(id: &str) -> Cookie<'static> {
 #[tokio::test]
 async fn admin_pages_render() {
     let (client, _db, admin) = setup().await;
-    for path in [
-        "/admin/v1/dashboard",
-        "/admin/v1/components",
-        "/admin/v1/setting",
-        "/admin/v1/profile",
-    ] {
+    // (path, markers that must be present — parity with NodeAdmin views)
+    let cases = [
+        (
+            "/admin/v1/dashboard",
+            vec![
+                "Dashboard Overview",
+                "Recent Activities",
+                "Top Products",
+                "Recent Orders",
+                "Active Theme",
+            ],
+        ),
+        (
+            "/admin/v1/components",
+            vec![
+                "1. Stat Card",
+                "Rich Text Editor",
+                "9. Data Table",
+                "Confirm Dialog",
+            ],
+        ),
+        (
+            "/admin/v1/setting",
+            vec![
+                "Admin Theme",
+                "theme-swatch",
+                "Frontend Template",
+                "fe-card",
+                "Setting Form",
+                "[initial]",
+            ],
+        ),
+        (
+            "/admin/v1/profile",
+            vec![
+                "User Form",
+                "name=\"code\"",
+                "name=\"timezone\"",
+                "name=\"status\"",
+                "name=\"picture\"",
+            ],
+        ),
+    ];
+    for (path, markers) in cases {
         let res = client
             .get(path)
             .private_cookie(uid(&admin))
             .dispatch()
             .await;
         assert_eq!(res.status(), Status::Ok, "{path} should render");
+        let body = res.into_string().await.unwrap();
+        for m in markers {
+            assert!(body.contains(m), "{path} should contain `{m}`");
+        }
     }
 }
 

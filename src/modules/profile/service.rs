@@ -9,9 +9,12 @@ use crate::modules::access::models::user;
 
 #[derive(Debug, Default, Clone)]
 pub struct ProfileInput {
+    pub code: Option<String>,
     pub name: String,
     pub email: String,
     pub phone: Option<String>,
+    pub timezone: Option<String>,
+    pub status: Option<String>,
     /// Empty/None = keep existing password.
     pub password: Option<String>,
 }
@@ -46,9 +49,18 @@ impl IProfileService for ProfileService {
     ) -> AppResult<()> {
         let existing = self.get(db, user_id).await?;
         let mut am = existing.into_active_model();
+        if let Some(code) = input.code.filter(|c| !c.trim().is_empty()) {
+            am.code = Set(code);
+        }
         am.name = Set(input.name);
         am.email = Set(input.email);
         am.phone = Set(input.phone);
+        if let Some(tz) = input.timezone {
+            am.timezone = Set(Some(tz));
+        }
+        if let Some(status) = input.status.filter(|s| !s.trim().is_empty()) {
+            am.status = Set(status);
+        }
         if let Some(pw) = input.password.filter(|p| !p.is_empty()) {
             am.password = Set(bcrypt::hash(&pw, 10)?);
         }

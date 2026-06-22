@@ -66,7 +66,7 @@ impl From<SettingForm> for SettingInput {
     }
 }
 
-#[get("/setting?<fe_page>&<fe_search>")]
+#[get("/setting?<fe_page>&<fe_search>&<fe_category>")]
 #[allow(clippy::too_many_arguments)]
 pub async fn index(
     auth: Authorized,
@@ -77,6 +77,7 @@ pub async fn index(
     flash: Option<FlashMessage<'_>>,
     fe_page: Option<u64>,
     fe_search: Option<String>,
+    fe_category: Option<String>,
 ) -> Result<Template, AppError> {
     let setting = svc.get(db.inner()).await?;
     let csrf = ensure_token(cookies);
@@ -88,7 +89,12 @@ pub async fn index(
         .fe_template
         .clone()
         .unwrap_or_else(|| DEFAULT_FE_TEMPLATE.to_string());
-    let cat = catalog.paginate(fe_search.as_deref(), None, fe_page, &active);
+    let cat = catalog.paginate(
+        fe_search.as_deref(),
+        fe_category.as_deref(),
+        fe_page,
+        &active,
+    );
     let mut page = json!({
         "setting": setting,
         "flash": flash_v,
@@ -96,7 +102,13 @@ pub async fn index(
         "fe_meta": cat.meta,
         "fe_pages": cat.pages,
         "fe_active": active,
+        "fe_categories": catalog.categories(),
+        "filter": {
+            "q_name": fe_search.clone().unwrap_or_default(),
+            "q_category": fe_category.clone().unwrap_or_default(),
+        },
         "fe_search": fe_search.unwrap_or_default(),
+        "fe_category": fe_category.unwrap_or_default(),
     });
     // merge chrome
     if let (Value::Object(b), Value::Object(c)) = (&mut page, chrome(&auth.0, &csrf)) {

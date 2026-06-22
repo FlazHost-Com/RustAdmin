@@ -24,8 +24,10 @@ pub async fn index(
     let permissions = permission::Entity::find().count(db.inner()).await?;
     let csrf = ensure_token(cookies);
 
+    let now = chrono::Local::now().format("%Y-%m-%d %H:%M").to_string();
     let mut page = json!({
         "stats": { "users": users, "roles": roles, "permissions": permissions },
+        "now": now,
     });
     merge(&mut page, chrome(&user, &csrf, "dashboard"));
     Ok(render_view("be/default/dashboard/index", page, None))

@@ -25,6 +25,8 @@ pub struct CatalogPage {
 pub trait IFeCatalogService: Send + Sync {
     /// Full catalog (curated fallback), active template pinned to the front.
     fn catalog(&self, active_slug: &str) -> Vec<FeTemplate>;
+    /// Distinct categories (for the catalog filter dropdown).
+    fn categories(&self) -> Vec<String>;
     /// Server-side search + pagination (12/page) with the active template pinned to page 1.
     fn paginate(
         &self,
@@ -57,6 +59,13 @@ impl IFeCatalogService for FeCatalogService {
             list.insert(0, active);
         }
         list
+    }
+
+    fn categories(&self) -> Vec<String> {
+        let mut cats: Vec<String> = curated().into_iter().map(|t| t.category).collect();
+        cats.sort();
+        cats.dedup();
+        cats
     }
 
     fn paginate(

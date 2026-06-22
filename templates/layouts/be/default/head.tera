@@ -57,6 +57,7 @@
             .btn-primary:hover, .btn-primary-tw:hover { background: var(--theme-dark); @apply text-white; }
             .btn-success { @apply bg-green-600 text-white hover:bg-green-700; }
             .btn-danger  { @apply bg-red-600 text-white hover:bg-red-700; }
+            .btn-outline-dark { @apply border border-gray-800 text-gray-800 bg-white hover:bg-gray-800 hover:text-white; }
             .btn-group { @apply relative inline-flex gap-2; }
 
             /* ===== Tables ===== */
@@ -153,6 +154,8 @@
         }
         body { background: linear-gradient(135deg, var(--theme-light) 0%, #f8fafc 100%); }
         .tw-card { @apply bg-white rounded-2xl; box-shadow: 0 10px 25px -5px rgba(0,0,0,.08), 0 8px 10px -6px rgba(0,0,0,.05); }
+        .hover-scale { transition: transform .2s ease, box-shadow .2s ease; }
+        .hover-scale:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -8px rgba(0,0,0,.15); }
         .glass-effect { background: rgba(255,255,255,.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.2); }
         .sidebar-gradient { background: var(--theme-dark); }
         #tw-sidebar a, #tw-sidebar a:hover, #tw-sidebar a:focus { text-decoration: none; color: #fff; }
