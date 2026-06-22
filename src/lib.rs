@@ -18,6 +18,8 @@ pub mod config;
 pub mod db;
 pub mod errors;
 pub mod helpers;
+pub mod migrations;
+pub mod modules;
 pub mod rbac;
 
 /// Health endpoint — always mounted in both `full` and `api` modes.

@@ -42,6 +42,13 @@ sea-orm = { version = "1.1", features = [
     "with-chrono",
     "with-uuid",
 ] }
+sea-orm-migration = { version = "1.1", features = [
+    "runtime-tokio-rustls",
+    "sqlx-sqlite",
+    "sqlx-mysql",
+    "sqlx-postgres",
+] }
+async-trait = "0.1"
 
 # Password hashing + OTP randomness + ids + time
 bcrypt = "0.15"
@@ -54,3 +61,7 @@ chrono-tz = "0.9"
 tracing = "0.1"
 
 [dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+sea-orm = { version = "1.1", features = ["macros", "with-chrono", "with-uuid"] }
+uuid = { version = "1", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
