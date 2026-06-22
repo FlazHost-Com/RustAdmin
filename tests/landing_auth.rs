@@ -25,6 +25,8 @@ async fn landing_renders_bound_to_setting() {
     let client = client().await;
     let res = client.get("/").dispatch().await;
     assert_eq!(res.status(), Status::Ok);
+    // template responses must be served as HTML (not text/plain) so browsers render them
+    assert_eq!(res.content_type(), Some(ContentType::HTML));
     let body = res.into_string().await.unwrap();
     assert!(body.contains("RustAdmin"));
     assert!(body.contains("Sign in"));

@@ -38,7 +38,7 @@ use modules::home::{FeCatalogService, IFeCatalogService};
 use modules::profile::service::{IProfileService, ProfileService};
 use modules::setting::services::{ISettingService, SettingService};
 use security::blacklist::{InMemoryTokenStore, TokenStore};
-use security::headers::SecurityHeaders;
+use security::headers::{HtmlContentType, SecurityHeaders};
 use security::method_override::MethodOverride;
 
 /// Health endpoint — always mounted in both `full` and `api` modes.
@@ -84,6 +84,7 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
         .manage(profile_service)
         .manage(fe_catalog)
         .attach(SecurityHeaders)
+        .attach(HtmlContentType)
         .attach(MethodOverride)
         .mount("/", routes![healthz])
         .mount("/api/v1/auth", modules::auth::routes::api::routes())
