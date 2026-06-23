@@ -77,8 +77,31 @@ async fn bad_login_redirects_back() {
         .dispatch()
         .await;
     assert!((300..400).contains(&res.status().code));
-    // and the dashboard is NOT accessible
+    // and the dashboard is NOT accessible — a logged-out web request redirects to login
     let res = client.get("/admin/v1/dashboard").dispatch().await;
+    assert_eq!(res.status(), Status::SeeOther);
+    assert_eq!(res.headers().get_one("Location"), Some("/auth/login"));
+}
+
+#[tokio::test]
+async fn unauthenticated_web_route_redirects_to_login() {
+    let client = client().await;
+    // GET an authenticated admin page while logged out → redirect to /auth/login (NOT 401/404)
+    for path in [
+        "/admin/v1/dashboard",
+        "/admin/v1/access/user",
+        "/admin/v1/setting",
+    ] {
+        let res = client.get(path).dispatch().await;
+        assert_eq!(res.status(), Status::SeeOther, "{path} should redirect");
+        assert_eq!(
+            res.headers().get_one("Location"),
+            Some("/auth/login"),
+            "{path} should redirect to login"
+        );
+    }
+    // API stays JSON 401 (no redirect)
+    let res = client.get("/api/v1/access/user").dispatch().await;
     assert_eq!(res.status(), Status::Unauthorized);
 }
 

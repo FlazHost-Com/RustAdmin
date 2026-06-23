@@ -55,7 +55,9 @@
     </div>
     <div class="mb-3">
       <label class="form-label fw-semibold d-block">Blocked</label>
-      <input id="blocked" type="checkbox" class="form-check-input" name="blocked" value="1" {% if data.blocked %}checked{% endif %}>
+      <div class="d-flex flex-wrap gap-3 p-2 rounded border">
+        <label class="d-flex align-items-center gap-2"><input id="blocked" type="checkbox" name="blocked" value="1" class="w-4 h-4" {% if data.blocked %}checked{% endif %}><span>Blokir akun</span></label>
+      </div>
     </div>
     <div class="mb-3" id="div_blocked_reason">
       <label for="blocked_reason" class="form-label fw-semibold">Blocked Reason</label>
@@ -63,12 +65,9 @@
     </div>
     <div class="mb-4">
       <label class="form-label fw-semibold d-block">Role</label>
-      <div class="d-flex flex-wrap gap-3 p-2 rounded {% if errors.roles %}border border-danger{% endif %}">
+      <div class="d-flex flex-wrap gap-3 p-2 rounded border {% if errors.roles %}border-danger{% endif %}">
         {% for role in roles %}
-        <div class="form-check">
-          <input id="roles{{ loop.index }}" type="checkbox" class="form-check-input" name="roles" value="{{ role.id }}" {% if role.id in role_ids %}checked{% endif %}>
-          <label for="roles{{ loop.index }}" class="form-check-label">{{ role.name }}</label>
-        </div>
+        <label class="d-flex align-items-center gap-2"><input id="roles{{ loop.index }}" type="checkbox" name="roles" value="{{ role.id }}" class="w-4 h-4" {% if role.id in role_ids %}checked{% endif %}><span>{{ role.name }}</span></label>
         {% endfor %}
       </div>
       {% if errors.roles %}<div class="text-red-600 text-sm mt-1">{{ errors.roles }}</div>{% endif %}

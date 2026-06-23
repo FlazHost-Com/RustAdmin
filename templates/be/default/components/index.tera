@@ -121,6 +121,13 @@
       <select class="form-control"><option>Active</option><option>Inactive</option></select>
     </div>
     <div class="mb-3">
+      <label class="form-label fw-semibold d-block">Checkbox</label>
+      <div class="d-flex flex-wrap gap-3 p-2 rounded border">
+        <label class="d-flex align-items-center gap-2"><input type="checkbox" checked class="w-4 h-4"><span>Checked option</span></label>
+        <label class="d-flex align-items-center gap-2"><input type="checkbox" class="w-4 h-4"><span>Empty option</span></label>
+      </div>
+    </div>
+    <div class="mb-3">
       <label class="form-label fw-semibold">Textarea (plain)</label>
       <textarea class="form-control" placeholder="Plain text without formatting"></textarea>
     </div>

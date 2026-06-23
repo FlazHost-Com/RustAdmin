@@ -15,8 +15,14 @@ use std::sync::Arc;
 
 use rocket::fairing::AdHoc;
 use rocket::fs::FileServer;
+use rocket::http::Status;
+use rocket::request::Request;
+use rocket::response::status::Custom;
+use rocket::response::Redirect;
+use rocket::serde::json::Json;
 use rocket::{Build, Rocket};
 use sea_orm::DatabaseConnection;
+use serde_json::{json, Value};
 
 pub mod config;
 pub mod db;
@@ -45,6 +51,46 @@ use security::method_override::MethodOverride;
 #[get("/healthz")]
 fn healthz() -> &'static str {
     "ok"
+}
+
+/// Catcher response: a web redirect or an API JSON error (a guard can't redirect directly,
+/// so unauthenticated/forbidden statuses are mapped here — mirrors NodeAdmin
+/// `ensureAuthenticated` which `res.redirect('/auth/login')` for web, JSON 401 for api).
+#[derive(Responder)]
+#[allow(clippy::large_enum_variant)]
+enum CatchResponse {
+    Web(Redirect),
+    Api(Custom<Json<Value>>),
+}
+
+fn is_api(req: &Request<'_>) -> bool {
+    req.uri().path().as_str().starts_with("/api")
+}
+
+/// 401 → web redirects to the login page; api returns JSON.
+#[catch(401)]
+fn unauthorized(req: &Request<'_>) -> CatchResponse {
+    if is_api(req) {
+        CatchResponse::Api(Custom(
+            Status::Unauthorized,
+            Json(json!({ "success": false, "message": "Unauthenticated" })),
+        ))
+    } else {
+        CatchResponse::Web(Redirect::to("/auth/login"))
+    }
+}
+
+/// 403 → web sends the (authenticated) user back to the dashboard; api returns JSON.
+#[catch(403)]
+fn forbidden(req: &Request<'_>) -> CatchResponse {
+    if is_api(req) {
+        CatchResponse::Api(Custom(
+            Status::Forbidden,
+            Json(json!({ "success": false, "message": "Forbidden" })),
+        ))
+    } else {
+        CatchResponse::Web(Redirect::to("/admin/v1/dashboard"))
+    }
 }
 
 /// Build the Rocket instance from the environment, connecting the DB on ignite.
@@ -86,6 +132,7 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
         .attach(SecurityHeaders)
         .attach(HtmlContentType)
         .attach(MethodOverride)
+        .register("/", catchers![unauthorized, forbidden])
         .mount("/", routes![healthz])
         .mount("/api/v1/auth", modules::auth::routes::api::routes())
         .mount("/api/v1", modules::access::routes::api::routes());
