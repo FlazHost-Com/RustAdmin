@@ -2,15 +2,19 @@
 //! Files live under `storage/editor/`; served at `/storage/editor/<name>`.
 
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use serde_json::{json, Value};
 use uuid::Uuid;
 
 use crate::errors::{AppError, AppResult};
 
-const EDITOR_DIR: &str = "storage/editor";
 const URL_PREFIX: &str = "/storage/editor";
+
+/// Absolute editor storage dir (resolved from the app root so it works from any CWD).
+fn editor_dir() -> PathBuf {
+    crate::config::asset("storage/editor")
+}
 
 /// Allowed image extensions (whitelist) keyed by detected magic-byte extension.
 fn allowed_ext(ext: &str) -> bool {
@@ -18,7 +22,7 @@ fn allowed_ext(ext: &str) -> bool {
 }
 
 fn ensure_dir() -> AppResult<()> {
-    fs::create_dir_all(EDITOR_DIR).map_err(|e| AppError::internal(format!("storage init: {e}")))
+    fs::create_dir_all(editor_dir()).map_err(|e| AppError::internal(format!("storage init: {e}")))
 }
 
 /// Validate magic bytes + store the image; returns `{ name, url, key }`.
@@ -30,7 +34,7 @@ pub fn upload(bytes: &[u8]) -> AppResult<Value> {
     ensure_dir()?;
     let name = format!("{}.{}", Uuid::new_v4(), kind.extension());
     let key = format!("editor/{name}");
-    let dest = Path::new(EDITOR_DIR).join(&name);
+    let dest = editor_dir().as_path().join(&name);
     fs::write(&dest, bytes).map_err(|e| AppError::internal(format!("write file: {e}")))?;
 
     Ok(json!({ "name": name, "url": format!("{URL_PREFIX}/{name}"), "key": key }))
@@ -41,7 +45,7 @@ pub fn list() -> AppResult<Vec<Value>> {
     ensure_dir()?;
     let mut out = Vec::new();
     let entries =
-        fs::read_dir(EDITOR_DIR).map_err(|e| AppError::internal(format!("read dir: {e}")))?;
+        fs::read_dir(editor_dir()).map_err(|e| AppError::internal(format!("read dir: {e}")))?;
     for entry in entries.flatten() {
         if let Some(name) = entry.file_name().to_str() {
             if name.starts_with('.') {
@@ -63,7 +67,7 @@ pub fn delete(key: &str) -> AppResult<()> {
         .strip_prefix("editor/")
         .filter(|n| is_safe_name(n))
         .ok_or_else(|| AppError::bad_request("Invalid key"))?;
-    let path: PathBuf = Path::new(EDITOR_DIR).join(name);
+    let path: PathBuf = editor_dir().as_path().join(name);
     if path.exists() {
         fs::remove_file(&path).map_err(|e| AppError::internal(format!("delete file: {e}")))?;
     }

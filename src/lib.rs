@@ -109,6 +109,14 @@ pub fn build_rocket_with_db(cfg: Config, db: DatabaseConnection) -> Rocket<Build
 fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
     let mode = cfg.app.mode;
 
+    // Resolve the template dir absolutely so the app runs from ANY working directory
+    // (rocket_dyn_templates defaults to a CWD-relative "templates"). Static/storage dirs are
+    // resolved the same way below via `config::asset`.
+    let figment = rocket::Config::figment().merge((
+        "template_dir",
+        config::asset("templates").to_string_lossy().to_string(),
+    ));
+
     // DI container ≈ Rocket managed state. Services are shared as trait objects.
     let token_store: Arc<dyn TokenStore> = Arc::new(InMemoryTokenStore::new());
     let auth_service: Arc<dyn IAuthService> = Arc::new(AuthService);
@@ -119,7 +127,7 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
     let profile_service: Arc<dyn IProfileService> = Arc::new(ProfileService);
     let fe_catalog: Arc<dyn IFeCatalogService> = Arc::new(FeCatalogService);
 
-    let mut rocket = rocket::build()
+    let mut rocket = rocket::custom(figment)
         .manage(cfg)
         .manage(token_store)
         .manage(auth_service)
@@ -180,10 +188,16 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
             .mount("/admin/v1", modules::media::controllers::routes())
             .mount(
                 "/be/default",
-                FileServer::from("static/be/default").rank(10),
+                FileServer::from(config::asset("static/be/default")).rank(10),
             )
-            .mount("/static", FileServer::from("static").rank(11))
-            .mount("/storage", FileServer::from("storage").rank(12))
+            .mount(
+                "/static",
+                FileServer::from(config::asset("static")).rank(11),
+            )
+            .mount(
+                "/storage",
+                FileServer::from(config::asset("storage")).rank(12),
+            )
             .attach(helpers::view::template_fairing());
     }
 

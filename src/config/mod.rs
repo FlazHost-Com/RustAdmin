@@ -10,5 +10,5 @@ pub mod env;
 pub mod fe_templates;
 pub mod themes;
 
-pub use env::{AppMode, Config};
+pub use env::{app_root, asset, AppMode, Config};
 pub use themes::{Theme, DEFAULT_THEME, THEMES, THEME_NAMES};

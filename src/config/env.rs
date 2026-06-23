@@ -5,6 +5,26 @@
 //! (`SESSION_SECRET`, `JWT_SECRET`) fail-fast in production.
 
 use std::env;
+use std::path::PathBuf;
+
+/// Application root for assets (templates/static/storage), so the app runs from ANY working
+/// directory (not only the project root). Resolution order:
+/// `APP_ROOT` env → the compiled crate dir (dev, via `CARGO_MANIFEST_DIR`) → current dir.
+pub fn app_root() -> PathBuf {
+    if let Some(r) = opt("APP_ROOT") {
+        return PathBuf::from(r);
+    }
+    let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    if manifest.join("templates").is_dir() {
+        return manifest;
+    }
+    std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+}
+
+/// Resolve an asset path relative to [`app_root`].
+pub fn asset(rel: &str) -> PathBuf {
+    app_root().join(rel)
+}
 
 /// Application run mode. `Full` = web UI + REST API; `Api` = REST API only (stateless).
 /// Selected at runtime via `APP_MODE` so a single codebase serves both variants.
