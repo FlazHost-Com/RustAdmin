@@ -66,6 +66,9 @@ ammonia = "4"
 # Magic-byte detection for safe uploads (don't trust client MIME)
 infer = "0.16"
 
+# HTTP client for the live frontend-template catalog (opentailwind) + on-demand download
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+
 # Logging
 tracing = "0.1"
 

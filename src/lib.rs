@@ -125,7 +125,7 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
     let permission_service: Arc<dyn IPermissionService> = Arc::new(PermissionService);
     let setting_service: Arc<dyn ISettingService> = Arc::new(SettingService);
     let profile_service: Arc<dyn IProfileService> = Arc::new(ProfileService);
-    let fe_catalog: Arc<dyn IFeCatalogService> = Arc::new(FeCatalogService);
+    let fe_catalog: Arc<dyn IFeCatalogService> = Arc::new(FeCatalogService::new());
 
     let mut rocket = rocket::custom(figment)
         .manage(cfg)

@@ -89,12 +89,15 @@ pub async fn index(
         .fe_template
         .clone()
         .unwrap_or_else(|| DEFAULT_FE_TEMPLATE.to_string());
-    let cat = catalog.paginate(
-        fe_search.as_deref(),
-        fe_category.as_deref(),
-        fe_page,
-        &active,
-    );
+    let cat = catalog
+        .paginate(
+            fe_search.as_deref(),
+            fe_category.as_deref(),
+            fe_page,
+            &active,
+        )
+        .await;
+    let fe_categories = catalog.categories().await;
     let mut page = json!({
         "setting": setting,
         "flash": flash_v,
@@ -102,7 +105,7 @@ pub async fn index(
         "fe_meta": cat.meta,
         "fe_pages": cat.pages,
         "fe_active": active,
-        "fe_categories": catalog.categories(),
+        "fe_categories": fe_categories,
         "filter": {
             "q_name": fe_search.clone().unwrap_or_default(),
             "q_category": fe_category.clone().unwrap_or_default(),
@@ -125,10 +128,19 @@ pub async fn update(
     _csrf: CsrfProtected,
     db: &State<DatabaseConnection>,
     svc: &State<Arc<dyn ISettingService>>,
+    catalog: &State<Arc<dyn IFeCatalogService>>,
     form: Form<SettingForm>,
 ) -> Flash<Redirect> {
-    match svc.update(db.inner(), form.into_inner().into()).await {
-        Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Setting saved successfully"),
+    let input: SettingInput = form.into_inner().into();
+    let fe = input.fe_template.clone();
+    match svc.update(db.inner(), input).await {
+        Ok(_) => {
+            // Download + cache the chosen frontend template on Save (PORTING_GUIDE: unduh saat Save).
+            if let Some(slug) = fe {
+                let _ = catalog.ensure(&slug).await;
+            }
+            Flash::success(Redirect::to(INDEX_URL), "Setting saved successfully")
+        }
         Err(e) => Flash::error(Redirect::to(INDEX_URL), e.message().to_string()),
     }
 }
@@ -140,7 +152,7 @@ pub async fn fe_preview(
     catalog: &State<Arc<dyn IFeCatalogService>>,
     slug: &str,
 ) -> Result<RawHtml<String>, AppError> {
-    Ok(RawHtml(catalog.preview_html(slug)?))
+    Ok(RawHtml(catalog.preview_html(slug).await?))
 }
 
 pub fn routes() -> Vec<rocket::Route> {

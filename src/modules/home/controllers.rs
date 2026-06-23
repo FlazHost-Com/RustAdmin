@@ -34,15 +34,15 @@ fn active_slug() -> String {
 
 async fn render_landing(catalog: &Arc<dyn IFeCatalogService>) -> Result<Landing, AppError> {
     let slug = active_slug();
-    if slug == DEFAULT_FE_TEMPLATE {
-        // native rich landing; render_view injects the cached `setting`
-        Ok(Landing::Native(render_view(
+    // default → native rich landing (render_view injects the cached `setting`);
+    // any other slug → its real downloaded HTML.
+    match catalog.active_html(&slug).await? {
+        None => Ok(Landing::Native(render_view(
             "fe/default/index",
             json!({}),
             None,
-        )))
-    } else {
-        Ok(Landing::Raw(RawHtml(catalog.preview_html(&slug)?)))
+        ))),
+        Some(html) => Ok(Landing::Raw(RawHtml(html))),
     }
 }
 

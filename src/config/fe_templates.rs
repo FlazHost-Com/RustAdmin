@@ -8,18 +8,19 @@
 //! Slug shape (opentailwind): `{category}-{NNN}-{name}`, regex
 //! `^([a-z]+(?:-[a-z]+)*)-(\d{3})-([a-z0-9-]+)$`. We parse it manually to avoid a regex dep.
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 /// The one template bundled & rendered via a native rich view (PORTING_GUIDE: must be a real
 /// opentailwind slug, not a generic "default"). It is also the initial `settings.fe_template`.
 pub const DEFAULT_FE_TEMPLATE: &str = "agency-consulting-002-creative-agency";
 
-/// Raw HTML base URL for on-demand template downloads.
+/// Raw HTML base URL for on-demand template downloads (opentailwind: branch `master`,
+/// directory `landings`, file `{slug}.html`).
 pub const RAW_BASE_URL: &str =
-    "https://raw.githubusercontent.com/lindoai/opentailwind/main/templates";
+    "https://raw.githubusercontent.com/lindoai/opentailwind/master/landings";
 
 /// A catalog entry (slug + derived metadata).
-#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct FeTemplate {
     pub slug: String,
     pub name: String,
