@@ -51,6 +51,7 @@ pub async fn login(
     ))
 }
 
+// POST: logout is a mutation (blacklists the token); GET must not have side effects.
 #[post("/logout")]
 pub async fn logout(
     claims: JwtClaims,

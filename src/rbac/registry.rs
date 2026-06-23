@@ -119,6 +119,7 @@ pub fn registry() -> Vec<RouteEntry> {
         ),
         // ---- api auth ----
         e("api.v1.auth.login", "POST", "/api/v1/auth/login"),
+        // logout = POST (mutation: blacklists the token — GET must not have side effects)
         e("api.v1.auth.logout", "POST", "/api/v1/auth/logout"),
     ];
 
