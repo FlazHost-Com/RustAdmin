@@ -67,7 +67,15 @@ async fn web_create_form_renders() {
         .dispatch()
         .await;
     assert_eq!(res.status(), Status::Ok);
-    assert!(res.into_string().await.unwrap().contains("User Form"));
+    let body = res.into_string().await.unwrap();
+    assert!(body.contains("User Form"));
+    // Picture field 1:1 with NodeAdmin: multipart form, plain .form-control file input,
+    // an always-rendered preview, and the previewImage handler.
+    assert!(body.contains("enctype=\"multipart/form-data\""));
+    assert!(body.contains(r#"type="file" class="form-control"#));
+    assert!(body.contains(r#"name="picture""#));
+    assert!(body.contains("previewImage(event)"));
+    assert!(body.contains(r#"id="preview""#));
 }
 
 #[tokio::test]

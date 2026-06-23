@@ -3,9 +3,11 @@
 use std::sync::Arc;
 
 use rocket::form::Form;
+use rocket::fs::TempFile;
 use rocket::http::CookieJar;
 use rocket::request::FlashMessage;
 use rocket::response::{Flash, Redirect};
+use rocket::tokio::io::AsyncReadExt;
 use rocket::State;
 use rocket_dyn_templates::Template;
 use sea_orm::DatabaseConnection;
@@ -144,17 +146,25 @@ pub async fn store(
     db: &State<DatabaseConnection>,
     svc: &State<Arc<dyn IUserService>>,
     cookies: &CookieJar<'_>,
-    form: Form<UserForm>,
+    form: Form<UserForm<'_>>,
 ) -> Flash<Redirect> {
-    match form.into_inner().validate_store() {
+    let mut f = form.into_inner();
+    let picture = f.picture.take();
+    match f.validate_store() {
         Err(fe) => {
             flash::stash(cookies, &fe.errors, &fe.old);
             Flash::error(Redirect::to(CREATE_URL), "Please fix the errors below")
         }
-        Ok(input) => match svc.store(db.inner(), input).await {
-            Ok(_) => Flash::success(Redirect::to(INDEX_URL), "User created successfully"),
-            Err(e) => Flash::error(Redirect::to(CREATE_URL), e.message().to_string()),
-        },
+        Ok(mut input) => {
+            match upload_picture(picture).await {
+                Ok(p) => input.picture = p,
+                Err(e) => return Flash::error(Redirect::to(CREATE_URL), e.message().to_string()),
+            }
+            match svc.store(db.inner(), input).await {
+                Ok(_) => Flash::success(Redirect::to(INDEX_URL), "User created successfully"),
+                Err(e) => Flash::error(Redirect::to(CREATE_URL), e.message().to_string()),
+            }
+        }
     }
 }
 
@@ -190,18 +200,26 @@ pub async fn update(
     svc: &State<Arc<dyn IUserService>>,
     cookies: &CookieJar<'_>,
     id: &str,
-    form: Form<UserForm>,
+    form: Form<UserForm<'_>>,
 ) -> Flash<Redirect> {
     let edit_url = format!("/admin/v1/access/user/{id}/edit");
-    match form.into_inner().validate_update() {
+    let mut f = form.into_inner();
+    let picture = f.picture.take();
+    match f.validate_update() {
         Err(fe) => {
             flash::stash(cookies, &fe.errors, &fe.old);
             Flash::error(Redirect::to(edit_url), "Please fix the errors below")
         }
-        Ok(input) => match svc.update(db.inner(), id, input).await {
-            Ok(_) => Flash::success(Redirect::to(INDEX_URL), "User updated successfully"),
-            Err(e) => Flash::error(Redirect::to(edit_url), e.message().to_string()),
-        },
+        Ok(mut input) => {
+            match upload_picture(picture).await {
+                Ok(p) => input.picture = p,
+                Err(e) => return Flash::error(Redirect::to(edit_url), e.message().to_string()),
+            }
+            match svc.update(db.inner(), id, input).await {
+                Ok(_) => Flash::success(Redirect::to(INDEX_URL), "User updated successfully"),
+                Err(e) => Flash::error(Redirect::to(edit_url), e.message().to_string()),
+            }
+        }
     }
 }
 
@@ -234,6 +252,28 @@ pub async fn delete_selected(
         Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Selected users deleted"),
         Err(e) => Flash::error(Redirect::to(INDEX_URL), e.message().to_string()),
     }
+}
+
+/// Read + store the optional avatar (magic-byte validated by the media service).
+/// Returns the stored URL, or `None` when no file was provided.
+async fn upload_picture(file: Option<TempFile<'_>>) -> Result<Option<String>, AppError> {
+    let Some(f) = file else {
+        return Ok(None);
+    };
+    if f.len() == 0 {
+        return Ok(None);
+    }
+    let mut reader = f
+        .open()
+        .await
+        .map_err(|e| AppError::internal(format!("read upload: {e}")))?;
+    let mut bytes = Vec::new();
+    reader
+        .read_to_end(&mut bytes)
+        .await
+        .map_err(|e| AppError::internal(format!("read upload: {e}")))?;
+    let data = crate::modules::media::service::upload(&bytes)?;
+    Ok(data.get("url").and_then(|u| u.as_str()).map(str::to_string))
 }
 
 /// A short timezone list for the form (full tz DB is overkill for the bootstrap).

@@ -3,14 +3,16 @@
 use std::collections::BTreeMap;
 
 use rocket::form::FromForm;
+use rocket::fs::TempFile;
 use serde_json::{json, Value};
 
 use crate::modules::access::services::user_service::{StoreUserInput, UpdateUserInput};
 use crate::modules::access::validators::FormError;
 
-/// Whitelisted user form fields (file `picture` handled separately by the media phase).
+/// Whitelisted user form fields. `picture` is a multipart file the controller uploads
+/// (magic-byte validated) and is NOT part of the text validation.
 #[derive(FromForm, Debug, Default)]
-pub struct UserForm {
+pub struct UserForm<'r> {
     pub code: Option<String>,
     pub name: Option<String>,
     pub phone: Option<String>,
@@ -22,9 +24,10 @@ pub struct UserForm {
     pub blocked: Option<String>,
     pub blocked_reason: Option<String>,
     pub roles: Vec<String>,
+    pub picture: Option<TempFile<'r>>,
 }
 
-impl UserForm {
+impl UserForm<'_> {
     fn trimmed(opt: &Option<String>) -> String {
         opt.as_deref().unwrap_or("").trim().to_string()
     }
