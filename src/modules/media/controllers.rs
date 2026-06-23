@@ -5,7 +5,6 @@ use rocket::fs::TempFile;
 use rocket::http::Status;
 use rocket::serde::json::{json, Json};
 use rocket::tokio::io::AsyncReadExt;
-use serde::Deserialize;
 use serde_json::Value;
 
 use crate::errors::AppError;
@@ -20,7 +19,7 @@ pub struct UploadForm<'r> {
     pub file: TempFile<'r>,
 }
 
-#[derive(Deserialize)]
+#[derive(FromForm)]
 pub struct DeleteBody {
     pub key: String,
 }
@@ -51,8 +50,10 @@ pub async fn upload(
     Ok((Status::Ok, Json(json!({ "success": true, "data": data }))))
 }
 
+// Body is form-encoded (`key=...`) — matches the jQuery file-manager plugin's
+// `$.ajax({ data: { key } })` default content-type; CSRF still arrives via header.
 #[post("/media/delete", data = "<body>")]
-pub async fn delete(_user: CurrentUser, _csrf: CsrfProtected, body: Json<DeleteBody>) -> ApiResult {
+pub async fn delete(_user: CurrentUser, _csrf: CsrfProtected, body: Form<DeleteBody>) -> ApiResult {
     service::delete(&body.key)?;
     Ok((
         Status::Ok,
