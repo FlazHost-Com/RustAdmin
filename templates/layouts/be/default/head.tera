@@ -179,7 +179,7 @@
     </style>
 
     <!-- Font Awesome + Bootstrap Icons (icon sets; not the Bootstrap framework) -->
-    <link rel="stylesheet" href="/be/default/vendor/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="/static/be/default/vendor/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <!-- Chart.js (dashboard charts) -->
@@ -192,7 +192,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.21.0/trumbowyg.min.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.21.0/ui/trumbowyg.min.css" crossorigin="anonymous" />
     <!-- File manager plugin for .trumbowyg-editor (uploads to media storage) -->
-    <script src="/be/default/vendor/trumbowyg/filemanager.js"></script>
+    <script src="/static/be/default/vendor/trumbowyg/filemanager.js"></script>
 
     <!-- select2 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>

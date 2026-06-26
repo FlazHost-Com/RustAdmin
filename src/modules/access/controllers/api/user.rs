@@ -68,7 +68,15 @@ pub async fn index(
     let idx = svc.index(db.inner(), &filter).await?;
     Ok((
         Status::Ok,
-        Json(json!({ "success": true, "data": idx.rows, "meta": idx.meta })),
+        Json(json!({
+            "status": true, "message": "OK", "datas": idx.rows,
+            "paginate_data": {
+                "total_data": idx.meta.total,
+                "current_page": idx.meta.page,
+                "page_size": idx.meta.page_size,
+                "total_page": idx.meta.total_pages,
+            }
+        })),
     ))
 }
 
@@ -83,7 +91,7 @@ pub async fn store(
     let id = svc.store(db.inner(), input).await?;
     Ok((
         Status::Created,
-        Json(json!({ "success": true, "message": "Created", "data": { "id": id } })),
+        Json(json!({ "status": true, "message": "Created", "data": { "id": id } })),
     ))
 }
 
@@ -97,7 +105,7 @@ pub async fn edit(
     let (user, role_ids, _roles) = svc.edit(db.inner(), id).await?;
     Ok((
         Status::Ok,
-        Json(json!({ "success": true, "data": { "user": user, "role_ids": role_ids } })),
+        Json(json!({ "status": true, "data": { "user": user, "role_ids": role_ids } })),
     ))
 }
 
@@ -113,7 +121,7 @@ pub async fn update(
     svc.update(db.inner(), id, input).await?;
     Ok((
         Status::Ok,
-        Json(json!({ "success": true, "message": "Updated" })),
+        Json(json!({ "status": true, "message": "Updated" })),
     ))
 }
 
@@ -127,7 +135,7 @@ pub async fn delete(
     svc.delete(db.inner(), id).await?;
     Ok((
         Status::Ok,
-        Json(json!({ "success": true, "message": "Deleted" })),
+        Json(json!({ "status": true, "message": "Deleted" })),
     ))
 }
 
@@ -142,7 +150,7 @@ pub async fn delete_selected(
         .await?;
     Ok((
         Status::Ok,
-        Json(json!({ "success": true, "message": "Deleted" })),
+        Json(json!({ "status": true, "message": "Deleted" })),
     ))
 }
 

@@ -60,6 +60,9 @@ uuid = { version = "1", features = ["v4"] }
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = "0.9"
 
+# Timing-safe byte comparison (CSRF token validation)
+subtle = "2"
+
 # HTML sanitization for rich-text (bluemonday/sanitize-html equivalent)
 ammonia = "4"
 

@@ -9,6 +9,7 @@
 
 use rocket::http::{Cookie, CookieJar, SameSite, Status};
 use rocket::request::{FromRequest, Outcome, Request};
+use subtle::ConstantTimeEq;
 use uuid::Uuid;
 
 pub const CSRF_COOKIE: &str = "csrf_token";
@@ -56,7 +57,9 @@ impl<'r> FromRequest<'r> for CsrfProtected {
             .get_private(CSRF_COOKIE)
             .map(|c| c.value().to_string());
         match (expected, submitted_token(req)) {
-            (Some(e), Some(s)) if !e.is_empty() && e == s => Outcome::Success(CsrfProtected),
+            (Some(e), Some(s)) if !e.is_empty() && e.as_bytes().ct_eq(s.as_bytes()).into() => {
+                Outcome::Success(CsrfProtected)
+            }
             _ => Outcome::Error((Status::Forbidden, ())),
         }
     }

@@ -7,7 +7,7 @@
   <title>{% if setting.name %}{{ setting.name }}{% else %}RustAdmin{% endif %}</title>
   {% if setting.icon %}<link rel="icon" href="{{ get_file(path=setting.icon) | safe }}">{% endif %}
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="/static/be/default/vendor/fontawesome-free/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/fe/default/css/style.css">
 </head>

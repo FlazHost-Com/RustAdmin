@@ -23,36 +23,36 @@ pub const THEMES: &[Theme] = &[
         name: "Blue",
         primary: "#3B82F6",
         secondary: "#60A5FA",
-        light: "#DBEAFE",
+        light: "#EFF6FF",
         dark: "#1E40AF",
     },
     Theme {
         name: "Purple",
         primary: "#8B5CF6",
         secondary: "#A78BFA",
-        light: "#F3E8FF",
-        dark: "#6D28D9",
+        light: "#F5F3FF",
+        dark: "#5B21B6",
     },
     Theme {
         name: "Green",
         primary: "#10B981",
         secondary: "#34D399",
-        light: "#D1FAE5",
-        dark: "#047857",
+        light: "#ECFDF5",
+        dark: "#065F46",
     },
     Theme {
         name: "Orange",
         primary: "#F59E0B",
-        secondary: "#FBBF24",
-        light: "#FEF3C7",
-        dark: "#D97706",
+        secondary: "#FCD34D",
+        light: "#FFFBEB",
+        dark: "#92400E",
     },
     Theme {
         name: "Red",
         primary: "#EF4444",
         secondary: "#F87171",
-        light: "#FECACA",
-        dark: "#B91C1C",
+        light: "#FEF2F2",
+        dark: "#991B1B",
     },
 ];
 
@@ -89,6 +89,6 @@ mod tests {
         assert_eq!(DEFAULT_THEME, "Blue");
         assert_eq!(get_theme("Blue").primary, "#3B82F6");
         assert_eq!(get_theme("nonexistent").name, "Blue");
-        assert_eq!(get_theme("Red").dark, "#B91C1C");
+        assert_eq!(get_theme("Red").dark, "#991B1B");
     }
 }

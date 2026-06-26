@@ -67,7 +67,15 @@ pub async fn index(
     let idx = svc.index(db.inner(), &filter).await?;
     Ok((
         Status::Ok,
-        Json(json!({ "success": true, "data": idx.rows, "meta": idx.meta })),
+        Json(json!({
+            "status": true, "message": "OK", "datas": idx.rows,
+            "paginate_data": {
+                "total_data": idx.meta.total,
+                "current_page": idx.meta.page,
+                "page_size": idx.meta.page_size,
+                "total_page": idx.meta.total_pages,
+            }
+        })),
     ))
 }
 
@@ -81,7 +89,7 @@ pub async fn store(
     let id = svc.store(db.inner(), to_input(body.into_inner())?).await?;
     Ok((
         Status::Created,
-        Json(json!({ "success": true, "data": { "id": id } })),
+        Json(json!({ "status": true, "data": { "id": id } })),
     ))
 }
 
@@ -93,7 +101,7 @@ pub async fn edit(
     id: &str,
 ) -> ApiResult {
     let role = svc.find(db.inner(), id).await?;
-    Ok((Status::Ok, Json(json!({ "success": true, "data": role }))))
+    Ok((Status::Ok, Json(json!({ "status": true, "data": role }))))
 }
 
 #[put("/access/role/<id>/update", data = "<body>")]
@@ -108,7 +116,7 @@ pub async fn update(
         .await?;
     Ok((
         Status::Ok,
-        Json(json!({ "success": true, "message": "Updated" })),
+        Json(json!({ "status": true, "message": "Updated" })),
     ))
 }
 
@@ -122,7 +130,7 @@ pub async fn delete(
     svc.delete(db.inner(), id).await?;
     Ok((
         Status::Ok,
-        Json(json!({ "success": true, "message": "Deleted" })),
+        Json(json!({ "status": true, "message": "Deleted" })),
     ))
 }
 
@@ -137,7 +145,7 @@ pub async fn delete_selected(
         .await?;
     Ok((
         Status::Ok,
-        Json(json!({ "success": true, "message": "Deleted" })),
+        Json(json!({ "status": true, "message": "Deleted" })),
     ))
 }
 
@@ -166,7 +174,15 @@ pub async fn permission(
     let idx = svc.list_permissions(db.inner(), id, &filter).await?;
     Ok((
         Status::Ok,
-        Json(json!({ "success": true, "data": idx.rows, "meta": idx.meta })),
+        Json(json!({
+            "status": true, "message": "OK", "datas": idx.rows,
+            "paginate_data": {
+                "total_data": idx.meta.total,
+                "current_page": idx.meta.page,
+                "page_size": idx.meta.page_size,
+                "total_page": idx.meta.total_pages,
+            }
+        })),
     ))
 }
 
@@ -181,7 +197,7 @@ pub async fn assign(
     svc.assign(db.inner(), id, permission_id).await?;
     Ok((
         Status::Ok,
-        Json(json!({ "success": true, "message": "Assigned" })),
+        Json(json!({ "status": true, "message": "Assigned" })),
     ))
 }
 
@@ -196,7 +212,7 @@ pub async fn unassign(
     svc.unassign(db.inner(), id, permission_id).await?;
     Ok((
         Status::Ok,
-        Json(json!({ "success": true, "message": "Unassigned" })),
+        Json(json!({ "status": true, "message": "Unassigned" })),
     ))
 }
 
@@ -212,7 +228,7 @@ pub async fn assign_selected(
         .await?;
     Ok((
         Status::Ok,
-        Json(json!({ "success": true, "message": "Assigned" })),
+        Json(json!({ "status": true, "message": "Assigned" })),
     ))
 }
 
@@ -228,6 +244,6 @@ pub async fn unassign_selected(
         .await?;
     Ok((
         Status::Ok,
-        Json(json!({ "success": true, "message": "Unassigned" })),
+        Json(json!({ "status": true, "message": "Unassigned" })),
     ))
 }
