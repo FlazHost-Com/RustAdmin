@@ -115,7 +115,7 @@ pub async fn store(
             Flash::error(Redirect::to(CREATE_URL), "Please fix the errors below")
         }
         Ok(input) => match svc.store(db.inner(), input).await {
-            Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Role created successfully"),
+            Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Create Role Success."),
             Err(e) => Flash::error(Redirect::to(CREATE_URL), e.message().to_string()),
         },
     }
@@ -154,7 +154,7 @@ pub async fn update(
             Flash::error(Redirect::to(edit_url), "Please fix the errors below")
         }
         Ok(input) => match svc.update(db.inner(), id, input).await {
-            Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Role updated successfully"),
+            Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Update Role Success."),
             Err(e) => Flash::error(Redirect::to(edit_url), e.message().to_string()),
         },
     }
@@ -169,7 +169,7 @@ pub async fn delete(
     id: &str,
 ) -> Flash<Redirect> {
     match svc.delete(db.inner(), id).await {
-        Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Role deleted successfully"),
+        Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Delete Role Success."),
         Err(e) => Flash::error(Redirect::to(INDEX_URL), e.message().to_string()),
     }
 }
@@ -186,7 +186,7 @@ pub async fn delete_selected(
         .delete_selected(db.inner(), form.into_inner().selected)
         .await
     {
-        Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Selected roles deleted"),
+        Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Delete Role Success."),
         Err(e) => Flash::error(Redirect::to(INDEX_URL), e.message().to_string()),
     }
 }
@@ -259,7 +259,7 @@ pub async fn assign(
 ) -> Flash<Redirect> {
     let back = format!("/admin/v1/access/role/{id}/permission");
     match svc.assign(db.inner(), id, permission_id).await {
-        Ok(_) => Flash::success(Redirect::to(back), "Permission assigned"),
+        Ok(_) => Flash::success(Redirect::to(back), "Assign Permission Success."),
         Err(e) => Flash::error(Redirect::to(back), e.message().to_string()),
     }
 }
@@ -274,7 +274,7 @@ pub async fn unassign(
 ) -> Flash<Redirect> {
     let back = format!("/admin/v1/access/role/{id}/permission");
     match svc.unassign(db.inner(), id, permission_id).await {
-        Ok(_) => Flash::success(Redirect::to(back), "Permission unassigned"),
+        Ok(_) => Flash::success(Redirect::to(back), "Unassign Permission Success."),
         Err(e) => Flash::error(Redirect::to(back), e.message().to_string()),
     }
 }
@@ -293,7 +293,7 @@ pub async fn assign_selected(
         .assign_selected(db.inner(), id, form.into_inner().selected)
         .await
     {
-        Ok(_) => Flash::success(Redirect::to(back), "Selected permissions assigned"),
+        Ok(_) => Flash::success(Redirect::to(back), "Assign Permission Success."),
         Err(e) => Flash::error(Redirect::to(back), e.message().to_string()),
     }
 }
@@ -312,7 +312,7 @@ pub async fn unassign_selected(
         .unassign_selected(db.inner(), id, form.into_inner().selected)
         .await
     {
-        Ok(_) => Flash::success(Redirect::to(back), "Selected permissions unassigned"),
+        Ok(_) => Flash::success(Redirect::to(back), "Unassign Permission Success."),
         Err(e) => Flash::error(Redirect::to(back), e.message().to_string()),
     }
 }

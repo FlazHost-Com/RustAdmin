@@ -96,7 +96,7 @@ pub async fn update(
         password: if pw.is_empty() { None } else { Some(pw) },
     };
     match svc.update(db.inner(), &user.id, input).await {
-        Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Profile updated successfully"),
+        Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Update Profile Success."),
         Err(e) => Flash::error(Redirect::to(INDEX_URL), e.message().to_string()),
     }
 }

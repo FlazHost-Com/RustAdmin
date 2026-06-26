@@ -10,7 +10,7 @@ pub struct Model {
     pub id: String,
     #[sea_orm(unique)]
     pub name: String,
-    pub guard_name: String,
+    pub guard_name: Option<String>,
     pub status: String,
     pub desc: Option<String>,
     pub created_by: Option<String>,

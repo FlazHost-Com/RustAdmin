@@ -159,7 +159,7 @@ impl<'r> Responder<'r, 'static> for AppError {
 
         if path.starts_with("/api") {
             let body = json!({
-                "success": false,
+                "status": false,
                 "message": msg,
                 "errors": self.fields(),
             });

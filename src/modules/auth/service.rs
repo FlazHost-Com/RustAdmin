@@ -13,9 +13,6 @@ use crate::errors::{AppError, AppResult};
 use crate::helpers::otp;
 use crate::modules::access::models::user;
 
-const BCRYPT_ROUNDS: u32 = 10;
-const OTP_TTL_MS: i64 = 10 * 60 * 1000;
-
 #[async_trait]
 pub trait IAuthService: Send + Sync {
     /// Verify credentials; returns the user on success, else `AppError` (401/403).
@@ -53,9 +50,16 @@ pub trait IAuthService: Send + Sync {
     ) -> AppResult<()>;
 }
 
-pub struct AuthService;
+pub struct AuthService {
+    pub bcrypt_rounds: u32,
+    pub otp_expiry_ms: i64,
+}
 
 impl AuthService {
+    pub fn new(bcrypt_rounds: u32, otp_expiry_ms: i64) -> Self {
+        Self { bcrypt_rounds, otp_expiry_ms }
+    }
+
     async fn by_email(db: &DatabaseConnection, email: &str) -> AppResult<Option<user::Model>> {
         Ok(user::Entity::find()
             .filter(user::Column::Email.eq(email))
@@ -74,12 +78,12 @@ impl IAuthService for AuthService {
     ) -> AppResult<user::Model> {
         let u = Self::by_email(db, email)
             .await?
-            .ok_or_else(|| AppError::unauthorized("Invalid credentials"))?;
+            .ok_or_else(|| AppError::unauthorized("Wrong email or password."))?;
         if u.blocked {
             return Err(AppError::forbidden("Account is blocked"));
         }
         if !bcrypt::verify(password, &u.password).unwrap_or(false) {
-            return Err(AppError::unauthorized("Invalid credentials"));
+            return Err(AppError::unauthorized("Wrong email or password."));
         }
         Ok(u)
     }
@@ -92,14 +96,14 @@ impl IAuthService for AuthService {
         password: &str,
     ) -> AppResult<user::Model> {
         if Self::by_email(db, email).await?.is_some() {
-            return Err(AppError::conflict("Email already registered"));
+            return Err(AppError::conflict("Email already exists."));
         }
         let id = Uuid::new_v4().to_string();
         let code: String = format!(
             "{:010}",
             (Utc::now().timestamp_millis() % 10_000_000_000) as u64
         );
-        let hashed = bcrypt::hash(password, BCRYPT_ROUNDS)?;
+        let hashed = bcrypt::hash(password, self.bcrypt_rounds)?;
         let model = user::ActiveModel {
             id: Set(id),
             code: Set(code),
@@ -123,10 +127,10 @@ impl IAuthService for AuthService {
     ) -> AppResult<String> {
         let u = Self::by_email(db, email)
             .await?
-            .ok_or_else(|| AppError::not_found("Email not found"))?;
+            .ok_or_else(|| AppError::not_found("Email not found."))?;
         let code = otp::generate_otp(6);
-        let hashed = otp::hash_otp(&code, BCRYPT_ROUNDS)?;
-        let expires = otp::expiry_from(Utc::now().timestamp_millis(), OTP_TTL_MS);
+        let hashed = otp::hash_otp(&code, self.bcrypt_rounds)?;
+        let expires = otp::expiry_from(Utc::now().timestamp_millis(), self.otp_expiry_ms);
         let mut am = u.into_active_model();
         am.password_otp = Set(Some(hashed));
         am.password_otp_expires = Set(Some(expires));
@@ -151,13 +155,13 @@ impl IAuthService for AuthService {
             .ok_or_else(|| AppError::bad_request("No reset request found"))?;
         let expires = u.password_otp_expires.unwrap_or(0);
         if Utc::now().timestamp_millis() > expires {
-            return Err(AppError::bad_request("OTP has expired"));
+            return Err(AppError::bad_request("OTP has expired."));
         }
         if !otp::verify_otp(otp_code, &hashed) {
-            return Err(AppError::bad_request("Invalid OTP"));
+            return Err(AppError::bad_request("OTP is invalid."));
         }
         let mut am = u.into_active_model();
-        am.password = Set(bcrypt::hash(new_password, BCRYPT_ROUNDS)?);
+        am.password = Set(bcrypt::hash(new_password, self.bcrypt_rounds)?);
         am.password_otp = Set(None);
         am.password_otp_expires = Set(None);
         am.update(db).await?;

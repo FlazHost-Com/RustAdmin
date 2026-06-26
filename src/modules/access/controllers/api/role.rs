@@ -20,7 +20,6 @@ type ApiResult = Result<(Status, Json<Value>), AppError>;
 #[derive(Debug, Deserialize, Default)]
 pub struct RoleBody {
     pub name: Option<String>,
-    pub guard_name: Option<String>,
     pub status: Option<String>,
     pub desc: Option<String>,
 }
@@ -41,7 +40,6 @@ fn to_input(b: RoleBody) -> Result<RoleInput, AppError> {
         .to_string();
     Ok(RoleInput {
         name,
-        guard_name: b.guard_name,
         status: b.status,
         desc: b.desc,
     })

@@ -131,7 +131,7 @@ pub async fn store(
             Flash::error(Redirect::to(CREATE_URL), "Please fix the errors below")
         }
         Ok(input) => match svc.store(db.inner(), input).await {
-            Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Permission created successfully"),
+            Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Create Permission Success."),
             Err(e) => Flash::error(Redirect::to(CREATE_URL), e.message().to_string()),
         },
     }
@@ -170,7 +170,7 @@ pub async fn update(
             Flash::error(Redirect::to(edit_url), "Please fix the errors below")
         }
         Ok(input) => match svc.update(db.inner(), id, input).await {
-            Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Permission updated successfully"),
+            Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Update Permission Success."),
             Err(e) => Flash::error(Redirect::to(edit_url), e.message().to_string()),
         },
     }
@@ -185,7 +185,7 @@ pub async fn delete(
     id: &str,
 ) -> Flash<Redirect> {
     match svc.delete(db.inner(), id).await {
-        Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Permission deleted successfully"),
+        Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Delete Permission Success."),
         Err(e) => Flash::error(Redirect::to(INDEX_URL), e.message().to_string()),
     }
 }
@@ -202,7 +202,7 @@ pub async fn delete_selected(
         .delete_selected(db.inner(), form.into_inner().selected)
         .await
     {
-        Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Selected permissions deleted"),
+        Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Delete Permission Success."),
         Err(e) => Flash::error(Redirect::to(INDEX_URL), e.message().to_string()),
     }
 }

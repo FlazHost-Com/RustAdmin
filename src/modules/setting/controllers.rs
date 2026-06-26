@@ -139,7 +139,7 @@ pub async fn update(
             if let Some(slug) = fe {
                 let _ = catalog.ensure(&slug).await;
             }
-            Flash::success(Redirect::to(INDEX_URL), "Setting saved successfully")
+            Flash::success(Redirect::to(INDEX_URL), "Save Setting Success.")
         }
         Err(e) => Flash::error(Redirect::to(INDEX_URL), e.message().to_string()),
     }

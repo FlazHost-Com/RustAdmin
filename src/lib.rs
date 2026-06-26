@@ -46,6 +46,7 @@ use modules::setting::services::{ISettingService, SettingService};
 use security::blacklist::{InMemoryTokenStore, TokenStore};
 use security::headers::{HtmlContentType, SecurityHeaders};
 use security::method_override::MethodOverride;
+use security::rate_limit::{AuthLimiter, OtpLimiter};
 
 /// Health endpoint — always mounted in both `full` and `api` modes.
 #[get("/healthz")]
@@ -73,7 +74,7 @@ fn unauthorized(req: &Request<'_>) -> CatchResponse {
     if is_api(req) {
         CatchResponse::Api(Custom(
             Status::Unauthorized,
-            Json(json!({ "success": false, "message": "Unauthenticated" })),
+            Json(json!({ "status": false, "message": "Unauthenticated", "data": null })),
         ))
     } else {
         CatchResponse::Web(Redirect::to("/auth/login"))
@@ -86,7 +87,7 @@ fn forbidden(req: &Request<'_>) -> CatchResponse {
     if is_api(req) {
         CatchResponse::Api(Custom(
             Status::Forbidden,
-            Json(json!({ "success": false, "message": "Forbidden" })),
+            Json(json!({ "status": false, "message": "Forbidden", "data": null })),
         ))
     } else {
         CatchResponse::Web(Redirect::to("/admin/v1/dashboard"))
@@ -119,7 +120,12 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
 
     // DI container ≈ Rocket managed state. Services are shared as trait objects.
     let token_store: Arc<dyn TokenStore> = Arc::new(InMemoryTokenStore::new());
-    let auth_service: Arc<dyn IAuthService> = Arc::new(AuthService);
+    let auth_limiter = AuthLimiter::new();
+    let otp_limiter = OtpLimiter::new();
+    let auth_service: Arc<dyn IAuthService> = Arc::new(AuthService::new(
+        cfg.security.bcrypt_rounds,
+        cfg.security.otp_expiry_ms,
+    ));
     let user_service: Arc<dyn IUserService> = Arc::new(UserService);
     let role_service: Arc<dyn IRoleService> = Arc::new(RoleService);
     let permission_service: Arc<dyn IPermissionService> = Arc::new(PermissionService);
@@ -130,6 +136,8 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
     let mut rocket = rocket::custom(figment)
         .manage(cfg)
         .manage(token_store)
+        .manage(auth_limiter)
+        .manage(otp_limiter)
         .manage(auth_service)
         .manage(user_service)
         .manage(role_service)

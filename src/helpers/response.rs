@@ -14,7 +14,7 @@ use crate::helpers::pagination::PaginationMeta;
 pub fn success<T: Serialize>(data: T) -> (Status, Json<Value>) {
     (
         Status::Ok,
-        Json(json!({ "success": true, "message": "OK", "data": data })),
+        Json(json!({ "status": true, "message": "OK", "data": data })),
     )
 }
 
@@ -22,7 +22,7 @@ pub fn success<T: Serialize>(data: T) -> (Status, Json<Value>) {
 pub fn success_msg<T: Serialize>(message: &str, data: T) -> (Status, Json<Value>) {
     (
         Status::Ok,
-        Json(json!({ "success": true, "message": message, "data": data })),
+        Json(json!({ "status": true, "message": message, "data": data })),
     )
 }
 
@@ -30,7 +30,7 @@ pub fn success_msg<T: Serialize>(message: &str, data: T) -> (Status, Json<Value>
 pub fn created<T: Serialize>(data: T) -> (Status, Json<Value>) {
     (
         Status::Created,
-        Json(json!({ "success": true, "message": "Created", "data": data })),
+        Json(json!({ "status": true, "message": "Created", "data": data })),
     )
 }
 
@@ -38,7 +38,7 @@ pub fn created<T: Serialize>(data: T) -> (Status, Json<Value>) {
 pub fn message(message: &str) -> (Status, Json<Value>) {
     (
         Status::Ok,
-        Json(json!({ "success": true, "message": message })),
+        Json(json!({ "status": true, "message": message, "data": null })),
     )
 }
 
@@ -46,6 +46,6 @@ pub fn message(message: &str) -> (Status, Json<Value>) {
 pub fn paginated<T: Serialize>(data: T, meta: &PaginationMeta) -> (Status, Json<Value>) {
     (
         Status::Ok,
-        Json(json!({ "success": true, "message": "OK", "data": data, "meta": meta })),
+        Json(json!({ "status": true, "message": "OK", "data": data, "meta": meta })),
     )
 }

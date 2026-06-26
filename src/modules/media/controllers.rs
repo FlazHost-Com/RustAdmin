@@ -27,7 +27,7 @@ pub struct DeleteBody {
 #[get("/media/list")]
 pub async fn list(_user: CurrentUser) -> ApiResult {
     let items = service::list()?;
-    Ok((Status::Ok, Json(json!({ "success": true, "data": items }))))
+    Ok((Status::Ok, Json(json!({ "status": true, "message": "OK", "data": items }))))
 }
 
 #[post("/media/upload", data = "<form>")]
@@ -36,6 +36,7 @@ pub async fn upload(
     _csrf: CsrfProtected,
     form: Form<UploadForm<'_>>,
 ) -> ApiResult {
+    const MAX_SIZE: usize = 2 * 1024 * 1024; // 2 MB
     let mut reader = form
         .file
         .open()
@@ -46,8 +47,11 @@ pub async fn upload(
         .read_to_end(&mut bytes)
         .await
         .map_err(|e| AppError::internal(format!("read upload: {e}")))?;
+    if bytes.len() > MAX_SIZE {
+        return Err(AppError::bad_request("File size exceeds 2MB limit."));
+    }
     let data = service::upload(&bytes)?;
-    Ok((Status::Ok, Json(json!({ "success": true, "data": data }))))
+    Ok((Status::Ok, Json(json!({ "status": true, "message": "OK", "data": data }))))
 }
 
 // Body is form-encoded (`key=...`) — matches the jQuery file-manager plugin's
@@ -57,7 +61,7 @@ pub async fn delete(_user: CurrentUser, _csrf: CsrfProtected, body: Form<DeleteB
     service::delete(&body.key)?;
     Ok((
         Status::Ok,
-        Json(json!({ "success": true, "message": "Deleted" })),
+        Json(json!({ "status": true, "message": "Deleted", "data": null })),
     ))
 }
 

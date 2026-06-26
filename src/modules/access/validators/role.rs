@@ -9,7 +9,6 @@ use crate::modules::access::validators::FormError;
 #[derive(FromForm, Debug, Default)]
 pub struct RoleForm {
     pub name: Option<String>,
-    pub guard_name: Option<String>,
     pub status: Option<String>,
     pub desc: Option<String>,
 }
@@ -18,7 +17,6 @@ impl RoleForm {
     fn old(&self) -> Value {
         json!({
             "name": t(&self.name),
-            "guard_name": t(&self.guard_name),
             "status": t(&self.status),
             "desc": t(&self.desc),
         })
@@ -33,7 +31,6 @@ impl RoleForm {
         }
         Ok(RoleInput {
             name: t(&self.name),
-            guard_name: o(&self.guard_name),
             status: o(&self.status),
             desc: o(&self.desc),
         })

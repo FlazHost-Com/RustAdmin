@@ -38,7 +38,7 @@ async fn migrates_and_seeds_admin() {
         .await
         .unwrap();
     let admin_role = admin_role.expect("Administrator role seeded");
-    assert_eq!(admin_role.guard_name, "web");
+    assert_eq!(admin_role.status, "Active");
 }
 
 #[tokio::test]
@@ -48,7 +48,6 @@ async fn desc_reserved_word_roundtrips() {
     let new = role::ActiveModel {
         id: Set(Uuid::new_v4().to_string()),
         name: Set("Editor".to_string()),
-        guard_name: Set("web".to_string()),
         status: Set("Active".to_string()),
         desc: Set(Some("Can edit content".to_string())),
         ..Default::default()

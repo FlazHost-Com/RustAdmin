@@ -126,12 +126,14 @@ pub struct MailConfig {
 }
 
 #[derive(Debug, Clone)]
-pub struct OssConfig {
-    pub access_id: String,
-    pub access_key: String,
+pub struct StorageConfig {
+    pub driver: String,
+    pub access_key_id: String,
+    pub secret_access_key: String,
     pub endpoint: String,
     pub bucket: String,
-    pub secure: bool,
+    pub region: String,
+    pub ssl: bool,
 }
 
 /// Root configuration. Built once via [`Config::from_env`] and shared as Rocket managed
@@ -147,7 +149,7 @@ pub struct Config {
     pub jwt: JwtConfig,
     pub security: SecurityConfig,
     pub mail: MailConfig,
-    pub oss: OssConfig,
+    pub storage: StorageConfig,
     pub default_page_size: u64,
     /// Name of the role that bypasses all RBAC checks.
     pub administrator_role: String,
@@ -207,12 +209,14 @@ impl Config {
                 from_name: get("MAIL_FROM_NAME", "RustAdmin"),
                 from_address: get("MAIL_FROM_ADDRESS", "no-reply@example.com"),
             },
-            oss: OssConfig {
-                access_id: get("OSS_ACCESS_ID", ""),
-                access_key: get("OSS_ACCESS_KEY", ""),
-                endpoint: get("OSS_ENDPOINT", ""),
-                bucket: get("OSS_BUCKET", ""),
-                secure: boolean("OSS_SSL", true),
+            storage: StorageConfig {
+                driver: get("STORAGE_DRIVER", "oss"),
+                access_key_id: get("STORAGE_ACCESS_KEY_ID", ""),
+                secret_access_key: get("STORAGE_SECRET_ACCESS_KEY", ""),
+                endpoint: get("STORAGE_ENDPOINT", ""),
+                bucket: get("STORAGE_BUCKET", ""),
+                region: get("STORAGE_REGION", ""),
+                ssl: boolean("STORAGE_SSL", true),
             },
             default_page_size: num("DEFAULT_PAGE_SIZE", 10),
             administrator_role: get("ADMINISTRATOR_ROLE", "Administrator"),

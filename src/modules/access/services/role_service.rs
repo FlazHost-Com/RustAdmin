@@ -28,7 +28,6 @@ pub struct RoleFilter {
 #[derive(Debug, Default, Clone)]
 pub struct RoleInput {
     pub name: String,
-    pub guard_name: Option<String>,
     pub status: Option<String>,
     pub desc: Option<String>,
 }
@@ -121,7 +120,6 @@ impl IRoleService for RoleService {
         role::ActiveModel {
             id: Set(id.clone()),
             name: Set(input.name),
-            guard_name: Set(input.guard_name.unwrap_or_else(|| "web".into())),
             status: Set(input.status.unwrap_or_else(|| "Active".into())),
             desc: Set(input.desc),
             ..Default::default()
@@ -142,9 +140,6 @@ impl IRoleService for RoleService {
         let existing = self.find(db, id).await?;
         let mut am = existing.into_active_model();
         am.name = Set(input.name);
-        if let Some(g) = input.guard_name {
-            am.guard_name = Set(g);
-        }
         am.status = Set(input.status.unwrap_or_else(|| "Active".into()));
         am.desc = Set(input.desc);
         am.update(db).await?;

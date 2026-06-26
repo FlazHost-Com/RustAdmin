@@ -29,9 +29,13 @@ pub fn ensure_token(cookies: &CookieJar<'_>) -> String {
 }
 
 /// The submitted token from header or query (no body parsing).
+/// Accepts both `x-csrf-token` (lowercase, standard) and `X-CSRF-Token` (legacy).
 fn submitted_token(req: &Request<'_>) -> Option<String> {
-    if let Some(h) = req.headers().get_one("X-CSRF-Token") {
-        return Some(h.to_string());
+    // Try lowercase first (standard NodeAdmin client sends lowercase)
+    for name in &["x-csrf-token", "X-CSRF-Token", "X-Csrf-Token"] {
+        if let Some(h) = req.headers().get_one(name) {
+            return Some(h.to_string());
+        }
     }
     match req.query_value::<String>("_csrf") {
         Some(Ok(v)) => Some(v),

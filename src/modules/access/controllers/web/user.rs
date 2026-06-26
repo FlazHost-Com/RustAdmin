@@ -161,7 +161,7 @@ pub async fn store(
                 Err(e) => return Flash::error(Redirect::to(CREATE_URL), e.message().to_string()),
             }
             match svc.store(db.inner(), input).await {
-                Ok(_) => Flash::success(Redirect::to(INDEX_URL), "User created successfully"),
+                Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Create User Success."),
                 Err(e) => Flash::error(Redirect::to(CREATE_URL), e.message().to_string()),
             }
         }
@@ -216,7 +216,7 @@ pub async fn update(
                 Err(e) => return Flash::error(Redirect::to(edit_url), e.message().to_string()),
             }
             match svc.update(db.inner(), id, input).await {
-                Ok(_) => Flash::success(Redirect::to(INDEX_URL), "User updated successfully"),
+                Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Update User Success."),
                 Err(e) => Flash::error(Redirect::to(edit_url), e.message().to_string()),
             }
         }
@@ -232,7 +232,7 @@ pub async fn delete(
     id: &str,
 ) -> Flash<Redirect> {
     match svc.delete(db.inner(), id).await {
-        Ok(_) => Flash::success(Redirect::to(INDEX_URL), "User deleted successfully"),
+        Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Delete User Success."),
         Err(e) => Flash::error(Redirect::to(INDEX_URL), e.message().to_string()),
     }
 }
@@ -249,7 +249,7 @@ pub async fn delete_selected(
         .delete_selected(db.inner(), form.into_inner().selected)
         .await
     {
-        Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Selected users deleted"),
+        Ok(_) => Flash::success(Redirect::to(INDEX_URL), "Delete User Success."),
         Err(e) => Flash::error(Redirect::to(INDEX_URL), e.message().to_string()),
     }
 }

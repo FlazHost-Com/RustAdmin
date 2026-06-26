@@ -11,6 +11,8 @@ pub mod csrf;
 pub mod headers;
 pub mod jwt;
 pub mod method_override;
+pub mod rate_limit;
 
 pub use blacklist::{InMemoryTokenStore, TokenStore};
 pub use jwt::Claims;
+pub use rate_limit::{AuthLimiter, AuthRateLimit, OtpLimiter, OtpRateLimit};

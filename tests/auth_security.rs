@@ -111,7 +111,6 @@ async fn rbac_context_loads_perms_and_admin_bypasses() {
     role::ActiveModel {
         id: Set(role_id.clone()),
         name: Set("Editor".into()),
-        guard_name: Set("web".into()),
         status: Set("Active".into()),
         desc: Set(None),
         ..Default::default()

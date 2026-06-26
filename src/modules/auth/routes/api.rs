@@ -18,6 +18,7 @@ use crate::guards::{CurrentUser, JwtClaims};
 use crate::modules::auth::service::IAuthService;
 use crate::security::blacklist::TokenStore;
 use crate::security::jwt;
+use crate::security::rate_limit::AuthRateLimit;
 
 #[derive(Debug, Deserialize)]
 pub struct LoginDto {
@@ -28,6 +29,7 @@ pub struct LoginDto {
 #[post("/login", data = "<body>")]
 pub async fn login(
     body: Json<LoginDto>,
+    _rl: AuthRateLimit,
     db: &State<DatabaseConnection>,
     cfg: &State<Config>,
     svc: &State<Arc<dyn IAuthService>>,
@@ -39,7 +41,7 @@ pub async fn login(
     Ok((
         Status::Ok,
         Json(json!({
-            "success": true,
+            "status": true,
             "message": "OK",
             "data": {
                 "token": token,
@@ -60,7 +62,7 @@ pub async fn logout(
     store.blacklist(&claims.0.jti, claims.0.ttl_secs());
     (
         Status::Ok,
-        Json(json!({ "success": true, "message": "Logged out" })),
+        Json(json!({ "status": true, "message": "Logged out" })),
     )
 }
 
@@ -69,7 +71,7 @@ pub async fn me(user: CurrentUser) -> (Status, Json<Value>) {
     (
         Status::Ok,
         Json(json!({
-            "success": true,
+            "status": true,
             "data": { "id": user.id, "name": user.name, "is_admin": user.is_admin }
         })),
     )

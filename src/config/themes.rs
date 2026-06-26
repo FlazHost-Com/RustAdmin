@@ -17,7 +17,7 @@ pub struct Theme {
 
 pub const DEFAULT_THEME: &str = "Blue";
 
-/// The 9 palettes, in display order (matches NodeAdmin exactly).
+/// The 5 standard palettes (Blue/Purple/Green/Orange/Red — identical to NodeAdmin).
 pub const THEMES: &[Theme] = &[
     Theme {
         name: "Blue",
@@ -27,18 +27,11 @@ pub const THEMES: &[Theme] = &[
         dark: "#1E40AF",
     },
     Theme {
-        name: "Black",
-        primary: "#374151",
-        secondary: "#4B5563",
-        light: "#6B7280",
-        dark: "#1F2937",
-    },
-    Theme {
-        name: "Brown",
-        primary: "#A16207",
-        secondary: "#D97706",
-        light: "#FEF3C7",
-        dark: "#78350F",
+        name: "Purple",
+        primary: "#8B5CF6",
+        secondary: "#A78BFA",
+        light: "#F3E8FF",
+        dark: "#6D28D9",
     },
     Theme {
         name: "Green",
@@ -48,13 +41,6 @@ pub const THEMES: &[Theme] = &[
         dark: "#047857",
     },
     Theme {
-        name: "Grey",
-        primary: "#6B7280",
-        secondary: "#9CA3AF",
-        light: "#E5E7EB",
-        dark: "#374151",
-    },
-    Theme {
         name: "Orange",
         primary: "#F59E0B",
         secondary: "#FBBF24",
@@ -62,25 +48,11 @@ pub const THEMES: &[Theme] = &[
         dark: "#D97706",
     },
     Theme {
-        name: "Purple",
-        primary: "#8B5CF6",
-        secondary: "#A78BFA",
-        light: "#F3E8FF",
-        dark: "#6D28D9",
-    },
-    Theme {
         name: "Red",
         primary: "#EF4444",
         secondary: "#F87171",
         light: "#FECACA",
         dark: "#B91C1C",
-    },
-    Theme {
-        name: "Yellow",
-        primary: "#F59E0B",
-        secondary: "#FCD34D",
-        light: "#FEF3C7",
-        dark: "#D97706",
     },
 ];
 
@@ -90,9 +62,7 @@ pub fn theme_names() -> Vec<&'static str> {
 }
 
 /// Convenience constant list of names (kept in sync with [`THEMES`]).
-pub const THEME_NAMES: &[&str] = &[
-    "Blue", "Black", "Brown", "Green", "Grey", "Orange", "Purple", "Red", "Yellow",
-];
+pub const THEME_NAMES: &[&str] = &["Blue", "Purple", "Green", "Orange", "Red"];
 
 /// Resolve a palette by name, falling back to the default theme.
 pub fn get_theme(name: &str) -> Theme {
@@ -108,9 +78,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn has_nine_themes() {
-        assert_eq!(THEMES.len(), 9);
-        assert_eq!(THEME_NAMES.len(), 9);
+    fn has_five_themes() {
+        assert_eq!(THEMES.len(), 5);
+        assert_eq!(THEME_NAMES.len(), 5);
         assert_eq!(theme_names(), THEME_NAMES.to_vec());
     }
 

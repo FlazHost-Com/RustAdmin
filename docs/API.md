@@ -33,7 +33,7 @@ REST-style paths (`GET /:id`, `PUT /:id`, …) intentionally **404**.
 ### Bodies
 
 - User store/update: `{code, name, email, password, phone?, timezone?, status?, blocked?, blocked_reason?, roles:[id]}`
-- Role store/update: `{name, guard_name?, status?, desc?}`
+- Role store/update: `{name, status?, desc?}`
 - Permission store/update: `{name, guard_name?, method?, status?, desc?}`
 
 ## Role → Permission management (symmetric to web)

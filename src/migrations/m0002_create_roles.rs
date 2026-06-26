@@ -26,12 +26,6 @@ impl MigrationTrait for Migration {
                             .unique_key(),
                     )
                     .col(
-                        ColumnDef::new(Alias::new("guard_name"))
-                            .string_len(20)
-                            .not_null()
-                            .default("web"),
-                    )
-                    .col(
                         ColumnDef::new(Alias::new("status"))
                             .string_len(20)
                             .not_null()
@@ -64,16 +58,7 @@ impl MigrationTrait for Migration {
             )
             .await?;
 
-        manager
-            .create_index(
-                Index::create()
-                    .if_not_exists()
-                    .name("roles__guard")
-                    .table(Alias::new("roles"))
-                    .col(Alias::new("guard_name"))
-                    .to_owned(),
-            )
-            .await
+        Ok(())
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {

@@ -15,6 +15,7 @@ use crate::guards::{clear_web_session, set_web_session};
 use crate::helpers::view::render_view;
 use crate::modules::auth::service::IAuthService;
 use crate::security::csrf::{ensure_token, CsrfProtected};
+use crate::security::rate_limit::{AuthRateLimit, OtpRateLimit};
 
 const DASHBOARD: &str = "/admin/v1/dashboard";
 const LOGIN: &str = "/auth/login";
@@ -65,6 +66,7 @@ pub fn login_page(cookies: &CookieJar<'_>, flash: Option<FlashMessage<'_>>) -> T
 #[post("/auth/login", data = "<form>")]
 pub async fn login_post(
     _csrf: CsrfProtected,
+    _rl: AuthRateLimit,
     db: &State<DatabaseConnection>,
     svc: &State<Arc<dyn IAuthService>>,
     cookies: &CookieJar<'_>,
@@ -76,7 +78,7 @@ pub async fn login_post(
     {
         Ok(user) => {
             set_web_session(cookies, &user.id);
-            Flash::success(Redirect::to(DASHBOARD), "Welcome back")
+            Flash::success(Redirect::to(DASHBOARD), "Login Success.")
         }
         Err(e) => Flash::error(Redirect::to(LOGIN), e.message().to_string()),
     }
@@ -101,6 +103,7 @@ pub fn register_page(cookies: &CookieJar<'_>, flash: Option<FlashMessage<'_>>) -
 #[post("/auth/register", data = "<form>")]
 pub async fn register_post(
     _csrf: CsrfProtected,
+    _rl: AuthRateLimit,
     db: &State<DatabaseConnection>,
     svc: &State<Arc<dyn IAuthService>>,
     cookies: &CookieJar<'_>,
@@ -118,7 +121,7 @@ pub async fn register_post(
     {
         Ok(user) => {
             set_web_session(cookies, &user.id);
-            Flash::success(Redirect::to(DASHBOARD), "Account created")
+            Flash::success(Redirect::to(DASHBOARD), "Register Success.")
         }
         Err(e) => Flash::error(Redirect::to("/auth/register"), e.message().to_string()),
     }
@@ -137,6 +140,7 @@ pub fn reset_req(cookies: &CookieJar<'_>, flash: Option<FlashMessage<'_>>) -> Te
 #[post("/admin/v1/auth/reset/request", data = "<form>")]
 pub async fn reset_request(
     _csrf: CsrfProtected,
+    _rl: AuthRateLimit,
     db: &State<DatabaseConnection>,
     svc: &State<Arc<dyn IAuthService>>,
     form: Form<ResetReqForm>,
@@ -144,7 +148,7 @@ pub async fn reset_request(
     match svc.request_password_reset(db.inner(), &form.email).await {
         Ok(_) => Flash::success(
             Redirect::to("/admin/v1/auth/reset/proc"),
-            "An OTP has been sent (check server logs in dev)",
+            "OTP Send Success.",
         ),
         Err(e) => Flash::error(
             Redirect::to("/admin/v1/auth/reset/req"),
@@ -166,6 +170,7 @@ pub fn reset_proc(cookies: &CookieJar<'_>, flash: Option<FlashMessage<'_>>) -> T
 #[post("/admin/v1/auth/reset/process", data = "<form>")]
 pub async fn reset_process(
     _csrf: CsrfProtected,
+    _rl: OtpRateLimit,
     db: &State<DatabaseConnection>,
     svc: &State<Arc<dyn IAuthService>>,
     form: Form<ResetProcForm>,
@@ -182,7 +187,7 @@ pub async fn reset_process(
     {
         Ok(_) => Flash::success(
             Redirect::to(LOGIN),
-            "Password reset successful, please log in",
+            "Reset Password Success.",
         ),
         Err(e) => Flash::error(
             Redirect::to("/admin/v1/auth/reset/proc"),
