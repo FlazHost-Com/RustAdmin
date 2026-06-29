@@ -49,7 +49,7 @@ fn to_input(b: PermissionBody) -> Result<PermissionInput, AppError> {
     })
 }
 
-#[get("/access/permission?<q_page>&<q_page_size>&<q_name>&<q_method>&<q_status>&<q_desc>")]
+#[get("/access/permission?<q_page>&<q_page_size>&<q_name>&<q_guard>&<q_method>&<q_status>&<q_desc>")]
 #[allow(clippy::too_many_arguments)]
 pub async fn index(
     _auth: Authorized,
@@ -58,6 +58,7 @@ pub async fn index(
     q_page: Option<u64>,
     q_page_size: Option<u64>,
     q_name: Option<String>,
+    q_guard: Option<String>,
     q_method: Option<String>,
     q_status: Option<String>,
     q_desc: Option<String>,
@@ -67,6 +68,7 @@ pub async fn index(
         page: q_page,
         page_size: q_page_size,
         name: q_name,
+        guard: q_guard,
         method: q_method,
         status: q_status,
         desc: q_desc,

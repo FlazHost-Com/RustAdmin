@@ -10,32 +10,52 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Add guard_name to roles
-        manager
-            .alter_table(
-                Table::alter()
-                    .table(Alias::new("roles"))
-                    .add_column_if_not_exists(
-                        ColumnDef::new(Alias::new("guard_name"))
-                            .string_len(20)
-                            .null()
-                            .default("web"),
-                    )
-                    .to_owned(),
-            )
-            .await?;
+        let db = manager.get_connection();
 
-        // Add favicon to settings
-        manager
-            .alter_table(
-                Table::alter()
-                    .table(Alias::new("settings"))
-                    .add_column_if_not_exists(
-                        ColumnDef::new(Alias::new("favicon")).string().null(),
-                    )
-                    .to_owned(),
-            )
-            .await?;
+        // guard_name to roles — ignore if already exists (SQLite IF NOT EXISTS compat)
+        let has_guard: i64 = db
+            .query_one(sea_orm::Statement::from_string(
+                manager.get_database_backend(),
+                "SELECT COUNT(*) FROM pragma_table_info('roles') WHERE name='guard_name'".to_owned(),
+            ))
+            .await?
+            .and_then(|r| r.try_get_by_index::<i64>(0).ok())
+            .unwrap_or(0);
+        if has_guard == 0 {
+            manager
+                .alter_table(
+                    Table::alter()
+                        .table(Alias::new("roles"))
+                        .add_column(
+                            ColumnDef::new(Alias::new("guard_name"))
+                                .string_len(20)
+                                .null()
+                                .default("web"),
+                        )
+                        .to_owned(),
+                )
+                .await?;
+        }
+
+        // favicon to settings — ignore if already exists
+        let has_favicon: i64 = db
+            .query_one(sea_orm::Statement::from_string(
+                manager.get_database_backend(),
+                "SELECT COUNT(*) FROM pragma_table_info('settings') WHERE name='favicon'".to_owned(),
+            ))
+            .await?
+            .and_then(|r| r.try_get_by_index::<i64>(0).ok())
+            .unwrap_or(0);
+        if has_favicon == 0 {
+            manager
+                .alter_table(
+                    Table::alter()
+                        .table(Alias::new("settings"))
+                        .add_column(ColumnDef::new(Alias::new("favicon")).string().null())
+                        .to_owned(),
+                )
+                .await?;
+        }
 
         Ok(())
     }

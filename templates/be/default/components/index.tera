@@ -3,11 +3,11 @@
 <div class="flex items-center justify-between mb-6">
   <div>
     <h1 class="text-2xl font-bold text-gray-800">UI Components</h1>
-    <p class="text-sm text-gray-600">Ready-to-use element reference. See <code>docs/UI_COMPONENTS.md</code> for copy-paste snippets.</p>
+    <p class="text-sm text-gray-600">Acuan elemen siap-pakai. Lihat <code>docs/UI_COMPONENTS.md</code> untuk snippet copy-paste.</p>
   </div>
 </div>
 
-<!-- 1. STAT CARDS + COUNTER -->
+<!-- ============ STAT CARDS + COUNTER ============ -->
 <section class="mb-10">
   <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">1. Stat Card + Counter</h2>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -16,7 +16,7 @@
         <div>
           <p class="text-gray-600 text-sm font-medium">Total Item</p>
           <p class="text-3xl font-bold text-gray-800 counter" data-target="1280">0</p>
-          <p class="text-green-500 text-sm mt-1"><i class="fas fa-arrow-up"></i> sample trend</p>
+          <p class="text-green-500 text-sm mt-1"><i class="fas fa-arrow-up"></i> contoh tren</p>
         </div>
         <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background:var(--theme-light)">
           <i class="fas fa-box text-xl" style="color:var(--primary)"></i>
@@ -38,43 +38,43 @@
   </div>
 </section>
 
-<!-- 2. CHARTS -->
+<!-- ============ CHARTS (themeable) ============ -->
 <section class="mb-10">
-  <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">2. Chart (Chart.js, themed colors)</h2>
+  <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">2. Chart (Chart.js, warna ikut tema)</h2>
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <div class="bg-white rounded-xl shadow-lg p-6"><h3 class="text-sm font-semibold text-gray-700 mb-3">Line Chart</h3><div class="h-64"><canvas id="demoLine"></canvas></div></div>
     <div class="bg-white rounded-xl shadow-lg p-6"><h3 class="text-sm font-semibold text-gray-700 mb-3">Doughnut Chart</h3><div class="h-64"><canvas id="demoDoughnut"></canvas></div></div>
   </div>
 </section>
 
-<!-- 3. BADGES / STATUS -->
+<!-- ============ BADGES / STATUS ============ -->
 <section class="mb-10">
-  <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">3. Badge &amp; Status</h2>
+  <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">3. Badge & Status</h2>
   <div class="bg-white rounded-xl shadow-lg p-6 flex flex-wrap items-center gap-3">
     <span class="badge text-bg-primary">Primary</span>
     <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">Delivered</span>
     <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">Processing</span>
     <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Shipped</span>
     <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-sm">Cancelled</span>
-    <span class="ml-4 text-sm text-gray-500">Status icon:</span>
+    <span class="ml-4 text-sm text-gray-500">Status ikon:</span>
     <i class="fas fa-check-circle text-green-500 text-xl" title="Active"></i>
     <i class="fas fa-times-circle text-red-500 text-xl" title="Inactive"></i>
   </div>
 </section>
 
-<!-- 4. ALERT -->
+<!-- ============ ALERT ============ -->
 <section class="mb-10">
   <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">4. Alert (flash)</h2>
-  <div class="alert alert-success shadow-sm">Example success message.</div>
-  <div class="alert alert-danger shadow-sm">Example error message.</div>
-  <div class="alert alert-info shadow-sm">Example info message.</div>
-  <div class="alert alert-warning shadow-sm">Example warning message.</div>
-  <div class="alert alert-primary shadow-sm">Themed accent alert (follows the template switcher).</div>
+  <div class="alert alert-success shadow-sm">Contoh pesan sukses.</div>
+  <div class="alert alert-danger shadow-sm">Contoh pesan error.</div>
+  <div class="alert alert-info shadow-sm">Contoh pesan info.</div>
+  <div class="alert alert-warning shadow-sm">Contoh pesan peringatan.</div>
+  <div class="alert alert-primary shadow-sm">Contoh alert beraksen tema (ikut template switcher).</div>
 </section>
 
-<!-- 5. BUTTON & DROPDOWN -->
+<!-- ============ BUTTON & DROPDOWN ============ -->
 <section class="mb-10">
-  <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">5. Button &amp; Dropdown Action</h2>
+  <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">5. Button & Dropdown Action</h2>
   <div class="bg-white rounded-xl shadow-lg p-6 flex flex-wrap items-center gap-3">
     <button class="btn btn-primary-tw px-4 py-2"><i class="fas fa-save me-1"></i> Primary</button>
     <button class="btn btn-success btn-sm">Success</button>
@@ -90,31 +90,31 @@
   </div>
 </section>
 
-<!-- 6. POPUP: Modal, Toast, Confirm -->
+<!-- ============ POPUP: Modal, Toast, Confirm ============ -->
 <section class="mb-10">
   <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">6. Popup (Modal / Toast / Confirm)</h2>
   <div class="bg-white rounded-xl shadow-lg p-6 flex flex-wrap items-center gap-3">
-    <button class="btn btn-primary-tw px-4 py-2" onclick="Modal.open({ title:'Example Modal', body:'<p>This is the modal body. Text/HTML/form supported.</p>' })">Open Modal</button>
-    <button class="btn btn-success btn-sm" onclick="Toast('Saved!', 'success')">Toast Success</button>
-    <button class="btn btn-danger btn-sm" onclick="Toast('Failed to save', 'error')">Toast Error</button>
-    <button class="btn btn-sm btn-primary" onclick="Toast('Just info', 'info')">Toast Info</button>
-    <button class="btn btn-danger px-4 py-2 text-white" onclick="confirmDialog('Delete this data?').then(function(ok){ Toast(ok?'Confirmed':'Cancelled', ok?'success':'info') })">Confirm Dialog</button>
+    <button class="btn btn-primary-tw px-4 py-2" onclick="Modal.open({ title:'Contoh Modal', body:'<p>Ini isi modal. Bisa teks/HTML/form.</p>' })">Buka Modal</button>
+    <button class="btn btn-success btn-sm" onclick="Toast('Tersimpan!', 'success')">Toast Success</button>
+    <button class="btn btn-danger btn-sm" onclick="Toast('Gagal menyimpan', 'error')">Toast Error</button>
+    <button class="btn btn-sm btn-primary" onclick="Toast('Sekadar info', 'info')">Toast Info</button>
+    <button class="btn btn-danger px-4 py-2 text-white" onclick="confirmDialog('Yakin hapus data ini?').then(function(ok){ Toast(ok?'Dikonfirmasi':'Dibatalkan', ok?'success':'info') })">Confirm Dialog</button>
   </div>
-  <p class="text-sm text-gray-500 mt-2">Delete buttons/links can also use the <code>data-confirm="message"</code> attribute → a themed confirm appears before submit.</p>
+  <p class="text-sm text-gray-500 mt-2">Tombol/link hapus juga bisa pakai atribut <code>data-confirm="pesan"</code> → otomatis muncul confirm bertema sebelum submit.</p>
 </section>
 
-<!-- 7. FORM -->
+<!-- ============ FORM ============ -->
 <section class="mb-10">
   <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">7. Form (CRUD)</h2>
   <div class="tw-card p-6">
     <div class="mb-3">
       <label class="form-label fw-semibold">Text Input</label>
-      <input type="text" class="form-control" placeholder="example">
+      <input type="text" class="form-control" placeholder="contoh">
     </div>
     <div class="mb-3">
-      <label class="form-label fw-semibold">Invalid Input</label>
-      <input type="text" class="form-control is-invalid" value="wrong">
-      <div class="invalid-feedback">Example validation message.</div>
+      <label class="form-label fw-semibold">Input Invalid</label>
+      <input type="text" class="form-control is-invalid" value="salah">
+      <div class="invalid-feedback">Contoh pesan validasi.</div>
     </div>
     <div class="mb-3">
       <label class="form-label fw-semibold">Select</label>
@@ -123,42 +123,45 @@
     <div class="mb-3">
       <label class="form-label fw-semibold d-block">Checkbox</label>
       <div class="d-flex flex-wrap gap-3 p-2 rounded border">
-        <label class="d-flex align-items-center gap-2"><input type="checkbox" checked class="w-4 h-4"><span>Checked option</span></label>
-        <label class="d-flex align-items-center gap-2"><input type="checkbox" class="w-4 h-4"><span>Empty option</span></label>
+        <label class="d-flex align-items-center gap-2"><input type="checkbox" checked class="w-4 h-4"><span>Opsi tercentang</span></label>
+        <label class="d-flex align-items-center gap-2"><input type="checkbox" class="w-4 h-4"><span>Opsi kosong</span></label>
       </div>
     </div>
     <div class="mb-3">
-      <label class="form-label fw-semibold">Textarea (plain)</label>
-      <textarea class="form-control" placeholder="Plain text without formatting"></textarea>
+      <label class="form-label fw-semibold">Textarea (biasa)</label>
+      <textarea class="form-control" placeholder="Teks polos tanpa format"></textarea>
     </div>
     <div class="mb-3">
-      <label class="form-label fw-semibold">File Upload (image)</label>
+      <label class="form-label fw-semibold">File Upload (gambar)</label>
       <div class="d-flex align-items-center gap-3">
-        <img id="filePreview" src="" width="90" height="90" class="rounded border p-1" style="object-fit:contain;background:#f8fafc" alt="preview">
+        <img id="filePreview" src="/be/default/img/placeholder.png" width="90" height="90"
+             class="rounded border p-1" style="object-fit:contain;background:#f8fafc"
+             onerror="this.style.visibility='hidden'">
         <input id="fileUpload" type="file" name="file" accept="image/*" class="form-control">
       </div>
-      <small class="text-muted">Upload forms use <code>enctype="multipart/form-data"</code>; images are magic-byte validated on save.</small>
+      <small class="text-muted">Form upload pakai <code>enctype="multipart/form-data"</code>. Gambar otomatis dikonversi ke WebP saat disimpan ke OSS.</small>
     </div>
     <button class="btn btn-primary-tw px-4 py-2"><i class="fas fa-save me-1"></i> Save</button>
   </div>
 </section>
 
-<!-- 8. RICH TEXT EDITOR -->
+<!-- ============ RICH TEXT EDITOR ============ -->
 <section class="mb-10">
   <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">8. Rich Text Editor (Trumbowyg + File Manager)</h2>
   <div class="tw-card p-6">
     <p class="text-sm text-gray-500 mb-4">
-      Textarea with a formatting toolbar + a <em>File Manager</em> button to upload/insert images.
-      Add the class <code>trumbowyg-editor</code> to a plain textarea to enable it.
+      Textarea dengan toolbar format + tombol <em>File Manager</em> untuk unggah/sisip gambar
+      langsung ke OSS. Tambahkan class <code>trumbowyg-editor</code> pada textarea biasa
+      (lihat <strong>nomor 7</strong>) untuk mengaktifkannya.
     </p>
     <div class="mb-2">
       <label class="form-label fw-semibold">Rich Text Editor + File Manager</label>
-      <textarea class="trumbowyg-editor form-control"><p>Write <strong>rich content</strong> here. Click the image icon in the toolbar to open the <em>File Manager</em>.</p></textarea>
+      <textarea class="trumbowyg-editor form-control"><p>Tulis konten <strong>kaya format</strong> di sini. Klik ikon gambar pada toolbar untuk membuka <em>File Manager</em>.</p></textarea>
     </div>
   </div>
 </section>
 
-<!-- 9. DATA TABLE + PAGINATION -->
+<!-- ============ DATA TABLE + PAGINATION ============ -->
 <section class="mb-10">
   <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">9. Data Table + Pagination</h2>
   <div class="tw-card p-0 overflow-hidden">
@@ -173,7 +176,7 @@
         </thead>
         <tbody>
           <tr>
-            <td>1</td><td>Example Item</td>
+            <td>1</td><td>Contoh Item</td>
             <td class="text-left"><i class="fas fa-check-circle text-green-500 text-xl"></i></td>
             <td class="text-center">
               <div class="btn-group">
@@ -201,13 +204,16 @@
 </section>
 
 <script>
-  var THEME = {{ theme | json_encode | safe }};
+  // Aksen tema dari server (template switcher)
+  var cs=getComputedStyle(document.documentElement); var THEME={primary:cs.getPropertyValue('--primary').trim()||'#3B82F6',secondary:cs.getPropertyValue('--secondary').trim()||'#60A5FA',light:cs.getPropertyValue('--theme-light').trim()||'#EFF6FF',dark:cs.getPropertyValue('--theme-dark').trim()||'#1E3A8A'};
 
+  // Counter animation
   document.querySelectorAll('.counter').forEach(function(el){
     var target = parseInt(el.getAttribute('data-target')), dur = 1200, step = target/(dur/16), cur = 0;
     var t = setInterval(function(){ cur += step; if(cur>=target){cur=target; clearInterval(t);} el.textContent = Math.floor(cur).toLocaleString(); }, 16);
   });
 
+  // File upload: preview gambar sebelum submit
   (function(){
     var input = document.getElementById('fileUpload'), prev = document.getElementById('filePreview');
     if (!input || !prev) return;
@@ -217,11 +223,13 @@
     });
   })();
 
+  // Chart line (warna ikut tema)
   new Chart(document.getElementById('demoLine').getContext('2d'), {
     type:'line',
-    data:{ labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], datasets:[{ label:'Demo', data:[12,19,8,15,9,17,22], borderColor:THEME.primary, backgroundColor:'rgba(0,0,0,0.05)', borderWidth:3, fill:true, tension:0.4 }] },
+    data:{ labels:['Sen','Sel','Rab','Kam','Jum','Sab','Min'], datasets:[{ label:'Demo', data:[12,19,8,15,9,17,22], borderColor:THEME.primary, backgroundColor:'rgba(0,0,0,0.05)', borderWidth:3, fill:true, tension:0.4 }] },
     options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } } }
   });
+  // Chart doughnut (warna pertama ikut tema)
   new Chart(document.getElementById('demoDoughnut').getContext('2d'), {
     type:'doughnut',
     data:{ labels:['A','B','C','D'], datasets:[{ data:[40,25,20,15], backgroundColor:[THEME.primary,'#10B981','#F59E0B','#EF4444'], borderWidth:0 }] },

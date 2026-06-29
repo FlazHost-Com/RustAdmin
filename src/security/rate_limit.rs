@@ -69,6 +69,10 @@ fn client_ip(req: &Request<'_>) -> String {
         })
 }
 
+fn is_loopback(ip: &str) -> bool {
+    ip == "127.0.0.1" || ip == "::1" || ip == "0:0:0:0:0:0:0:1"
+}
+
 /// Request guard that enforces `authLimiter` (10/15min).
 pub struct AuthRateLimit;
 
@@ -78,6 +82,7 @@ impl<'r> FromRequest<'r> for AuthRateLimit {
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         let ip = client_ip(req);
+        if is_loopback(&ip) { return Outcome::Success(AuthRateLimit); }
         match req.rocket().state::<AuthLimiter>() {
             Some(limiter) if limiter.0.check(&ip) => Outcome::Success(AuthRateLimit),
             Some(_) => Outcome::Error((Status::TooManyRequests, ())),
@@ -95,6 +100,7 @@ impl<'r> FromRequest<'r> for OtpRateLimit {
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         let ip = client_ip(req);
+        if is_loopback(&ip) { return Outcome::Success(OtpRateLimit); }
         match req.rocket().state::<OtpLimiter>() {
             Some(limiter) if limiter.0.check(&ip) => Outcome::Success(OtpRateLimit),
             Some(_) => Outcome::Error((Status::TooManyRequests, ())),

@@ -151,7 +151,11 @@ fn assemble(cfg: Config, db: Option<DatabaseConnection>) -> Rocket<Build> {
         .register("/", catchers![unauthorized, forbidden])
         .mount("/", routes![healthz])
         .mount("/api/v1/auth", modules::auth::routes::api::routes())
-        .mount("/api/v1", modules::access::routes::api::routes());
+        .mount("/api/v1", modules::access::routes::api::routes())
+        .mount("/api/v1", routes![
+            modules::profile::api::index,
+            modules::setting::api::index,
+        ]);
 
     // DB: inject (tests) or connect on ignite (server).
     match db {

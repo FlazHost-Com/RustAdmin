@@ -22,6 +22,7 @@ pub struct PermissionFilter {
     pub page: Option<u64>,
     pub page_size: Option<u64>,
     pub name: Option<String>,
+    pub guard: Option<String>,
     pub method: Option<String>,
     pub status: Option<String>,
     pub desc: Option<String>,
@@ -106,6 +107,9 @@ impl IPermissionService for PermissionService {
         let mut q = permission::Entity::find();
         if let Some(v) = ne(&filter.name) {
             q = q.filter(ci_like(permission::Column::Name, v));
+        }
+        if let Some(v) = ne(&filter.guard) {
+            q = q.filter(permission::Column::GuardName.eq(v));
         }
         if let Some(v) = ne(&filter.method) {
             q = q.filter(permission::Column::Method.eq(v));

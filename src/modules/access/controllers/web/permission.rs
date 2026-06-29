@@ -32,6 +32,7 @@ pub struct PermissionQuery {
     pub q_page: Option<u64>,
     pub q_page_size: Option<u64>,
     pub q_name: Option<String>,
+    pub q_guard: Option<String>,
     pub q_method: Option<String>,
     pub q_status: Option<String>,
     pub q_desc: Option<String>,
@@ -43,6 +44,7 @@ impl PermissionQuery {
             page: self.q_page,
             page_size: self.q_page_size,
             name: self.q_name.clone(),
+            guard: self.q_guard.clone(),
             method: self.q_method.clone(),
             status: self.q_status.clone(),
             desc: self.q_desc.clone(),
@@ -51,6 +53,7 @@ impl PermissionQuery {
     fn as_value(&self) -> Value {
         json!({
             "q_name": self.q_name.clone().unwrap_or_default(),
+            "q_guard": self.q_guard.clone().unwrap_or_default(),
             "q_method": self.q_method.clone().unwrap_or_default(),
             "q_status": self.q_status.clone().unwrap_or_default(),
             "q_desc": self.q_desc.clone().unwrap_or_default(),
@@ -62,6 +65,7 @@ impl PermissionQuery {
         filter_query(&[
             ("q_page_size", ps.as_deref()),
             ("q_name", self.q_name.as_deref()),
+            ("q_guard", self.q_guard.as_deref()),
             ("q_method", self.q_method.as_deref()),
             ("q_status", self.q_status.as_deref()),
             ("q_desc", self.q_desc.as_deref()),

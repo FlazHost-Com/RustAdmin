@@ -30,7 +30,7 @@
             <th width="30%"><input type="text" class="form-control" name="q_name" value="{{ filter.q_name | default(value='') }}"></th>
             <th width="15%">
               <select name="q_status" class="form-control">
-                <option value="">Select</option>
+                <option value="" disabled selected>Select</option>
                 <option value="Active" {% if filter.q_status == 'Active' %}selected{% endif %}>Active</option>
                 <option value="Inactive" {% if filter.q_status == 'Inactive' %}selected{% endif %}>Inactive</option>
               </select>
@@ -57,7 +57,7 @@
         <form id="selection">
           {% for data in datas %}
           <tr>
-            <td><input name="selected" value="{{ data.id }}" type="checkbox"/></td>
+            <td><input name="selected[]" value="{{ data.id }}" type="checkbox"/></td>
             <td>{{ loop.index + (meta.page_size * (meta.page - 1)) }}</td>
             <td>{{ data.name }}</td>
             <td class="text-left">
