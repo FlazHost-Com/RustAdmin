@@ -9,11 +9,15 @@ use uuid::Uuid;
 
 use crate::errors::{AppError, AppResult};
 
-const URL_PREFIX: &str = "/storage/editor";
+fn url_prefix() -> String {
+    let base = std::env::var("STORAGE_BASE_PATH").unwrap_or_else(|_| "storage".to_string());
+    format!("/{base}/editor")
+}
 
 /// Absolute editor storage dir (resolved from the app root so it works from any CWD).
 fn editor_dir() -> PathBuf {
-    crate::config::asset("storage/editor")
+    let base = std::env::var("STORAGE_BASE_PATH").unwrap_or_else(|_| "storage".to_string());
+    crate::config::asset(&format!("{base}/editor"))
 }
 
 /// Allowed image extensions (whitelist) keyed by detected magic-byte extension.
@@ -37,7 +41,7 @@ pub fn upload(bytes: &[u8]) -> AppResult<Value> {
     let dest = editor_dir().as_path().join(&name);
     fs::write(&dest, bytes).map_err(|e| AppError::internal(format!("write file: {e}")))?;
 
-    Ok(json!({ "name": name, "url": format!("{URL_PREFIX}/{name}"), "key": key }))
+    Ok(json!({ "name": name, "url": format!("{}/{name}", url_prefix()), "key": key }))
 }
 
 /// List stored images (most-recent-agnostic; name + url + key).
@@ -53,7 +57,7 @@ pub fn list() -> AppResult<Vec<Value>> {
             }
             out.push(json!({
                 "name": name,
-                "url": format!("{URL_PREFIX}/{name}"),
+                "url": format!("{}/{name}", url_prefix()),
                 "key": format!("editor/{name}"),
             }));
         }

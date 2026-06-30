@@ -128,6 +128,7 @@ pub struct MailConfig {
 #[derive(Debug, Clone)]
 pub struct StorageConfig {
     pub driver: String,
+    pub base_path: String,
     pub access_key_id: String,
     pub secret_access_key: String,
     pub endpoint: String,
@@ -210,7 +211,8 @@ impl Config {
                 from_address: get("MAIL_FROM_ADDRESS", "no-reply@example.com"),
             },
             storage: StorageConfig {
-                driver: get("STORAGE_DRIVER", "oss"),
+                driver: get("STORAGE_DRIVER", "local"),
+                base_path: get("STORAGE_BASE_PATH", "storage"),
                 access_key_id: get("STORAGE_ACCESS_KEY_ID", ""),
                 secret_access_key: get("STORAGE_SECRET_ACCESS_KEY", ""),
                 endpoint: get("STORAGE_ENDPOINT", ""),
