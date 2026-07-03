@@ -27,7 +27,10 @@ pub struct DeleteBody {
 #[get("/media/list")]
 pub async fn list(_user: CurrentUser) -> ApiResult {
     let items = service::list()?;
-    Ok((Status::Ok, Json(json!({ "status": true, "message": "OK", "data": items }))))
+    Ok((
+        Status::Ok,
+        Json(json!({ "status": true, "message": "OK", "data": items })),
+    ))
 }
 
 #[post("/media/upload", data = "<form>")]
@@ -51,7 +54,10 @@ pub async fn upload(
         return Err(AppError::bad_request("File size exceeds 2MB limit."));
     }
     let data = service::upload(&bytes)?;
-    Ok((Status::Ok, Json(json!({ "status": true, "message": "OK", "data": data }))))
+    Ok((
+        Status::Ok,
+        Json(json!({ "status": true, "message": "OK", "data": data })),
+    ))
 }
 
 // Body is form-encoded (`key=...`) — matches the jQuery file-manager plugin's

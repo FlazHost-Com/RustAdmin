@@ -69,12 +69,15 @@ pub async fn index(
     Ok((
         Status::Ok,
         Json(json!({
-            "status": true, "message": "OK", "datas": idx.rows,
-            "paginate_data": {
-                "total_data": idx.meta.total,
-                "current_page": idx.meta.page,
-                "page_size": idx.meta.page_size,
-                "total_page": idx.meta.total_pages,
+            "status": true, "message": "OK",
+            "data": {
+                "datas": idx.rows,
+                "paginate_data": {
+                    "total_data": idx.meta.total,
+                    "current_page": idx.meta.page,
+                    "page_size": idx.meta.page_size,
+                    "total_page": idx.meta.total_pages,
+                }
             }
         })),
     ))

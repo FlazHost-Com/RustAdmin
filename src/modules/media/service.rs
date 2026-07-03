@@ -10,13 +10,13 @@ use uuid::Uuid;
 use crate::errors::{AppError, AppResult};
 
 fn url_prefix() -> String {
-    let base = std::env::var("STORAGE_BASE_PATH").unwrap_or_else(|_| "storage".to_string());
+    let base = crate::config::storage_base_path();
     format!("/{base}/editor")
 }
 
 /// Absolute editor storage dir (resolved from the app root so it works from any CWD).
 fn editor_dir() -> PathBuf {
-    let base = std::env::var("STORAGE_BASE_PATH").unwrap_or_else(|_| "storage".to_string());
+    let base = crate::config::storage_base_path();
     crate::config::asset(&format!("{base}/editor"))
 }
 

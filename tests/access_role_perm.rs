@@ -189,8 +189,14 @@ async fn api_role_and_permission_list() {
         .await;
     assert_eq!(res.status(), Status::Ok);
     let v: serde_json::Value = res.into_json().await.unwrap();
+    // Canonical NodeAdmin list envelope: { status, message, data: { datas, paginate_data } }.
+    assert_eq!(v["status"], serde_json::json!(true));
     assert!(
-        !v["data"].as_array().unwrap().is_empty(),
+        !v["data"]["datas"].as_array().unwrap().is_empty(),
         "api synced permissions"
+    );
+    assert!(
+        v["data"]["paginate_data"]["total_data"].as_u64().unwrap() > 0,
+        "paginate_data present"
     );
 }

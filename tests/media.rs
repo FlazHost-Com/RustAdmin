@@ -75,7 +75,8 @@ async fn filemanager_list_upload_delete_roundtrip() {
         .await;
     assert_eq!(res.status(), Status::Ok);
     let v: serde_json::Value = res.into_json().await.unwrap();
-    assert_eq!(v["success"], true);
+    // Canonical NodeAdmin envelope: { status, message, data }.
+    assert_eq!(v["status"], true);
     let before = v["data"].as_array().unwrap().len();
 
     // 2) upload a PNG (multipart, CSRF header) → returns { data: { name, url, key } }
@@ -93,7 +94,10 @@ async fn filemanager_list_upload_delete_roundtrip() {
     let v: serde_json::Value = res.into_json().await.unwrap();
     let key = v["data"]["key"].as_str().unwrap().to_string();
     assert!(key.starts_with("editor/"), "key namespaced under editor/");
-    assert!(v["data"]["url"].as_str().unwrap().contains("/storage/editor/"));
+    assert!(v["data"]["url"]
+        .as_str()
+        .unwrap()
+        .contains("/storage/editor/"));
 
     // 3) list now has one more
     let res = client
@@ -114,7 +118,11 @@ async fn filemanager_list_upload_delete_roundtrip() {
         .body(format!("key={key}"))
         .dispatch()
         .await;
-    assert_eq!(res.status(), Status::Ok, "form-encoded delete should succeed");
+    assert_eq!(
+        res.status(),
+        Status::Ok,
+        "form-encoded delete should succeed"
+    );
 
     // 5) back to the original count
     let res = client

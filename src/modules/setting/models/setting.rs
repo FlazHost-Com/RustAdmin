@@ -14,7 +14,6 @@ pub struct Model {
     pub description: Option<String>,
     pub icon: Option<String>,
     pub logo: Option<String>,
-    pub favicon: Option<String>,
     pub login_image: Option<String>,
     pub phone: Option<String>,
     pub address: Option<String>,

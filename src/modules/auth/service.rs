@@ -57,7 +57,10 @@ pub struct AuthService {
 
 impl AuthService {
     pub fn new(bcrypt_rounds: u32, otp_expiry_ms: i64) -> Self {
-        Self { bcrypt_rounds, otp_expiry_ms }
+        Self {
+            bcrypt_rounds,
+            otp_expiry_ms,
+        }
     }
 
     async fn by_email(db: &DatabaseConnection, email: &str) -> AppResult<Option<user::Model>> {

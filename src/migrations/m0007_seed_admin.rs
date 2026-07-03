@@ -38,14 +38,12 @@ impl MigrationTrait for Migration {
                     .columns([
                         Alias::new("id"),
                         Alias::new("name"),
-                        Alias::new("guard_name"),
                         Alias::new("status"),
                         Alias::new("desc"),
                     ])
                     .values_panic([
                         role_id.clone().into(),
                         "Administrator".into(),
-                        "web".into(),
                         "Active".into(),
                         "".into(),
                     ])

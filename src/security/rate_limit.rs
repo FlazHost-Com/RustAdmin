@@ -51,9 +51,21 @@ impl AuthLimiter {
     }
 }
 
+impl Default for AuthLimiter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl OtpLimiter {
     pub fn new() -> Self {
         Self(RateLimiter::new(5, 15 * 60))
+    }
+}
+
+impl Default for OtpLimiter {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -82,7 +94,9 @@ impl<'r> FromRequest<'r> for AuthRateLimit {
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         let ip = client_ip(req);
-        if is_loopback(&ip) { return Outcome::Success(AuthRateLimit); }
+        if is_loopback(&ip) {
+            return Outcome::Success(AuthRateLimit);
+        }
         match req.rocket().state::<AuthLimiter>() {
             Some(limiter) if limiter.0.check(&ip) => Outcome::Success(AuthRateLimit),
             Some(_) => Outcome::Error((Status::TooManyRequests, ())),
@@ -100,7 +114,9 @@ impl<'r> FromRequest<'r> for OtpRateLimit {
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         let ip = client_ip(req);
-        if is_loopback(&ip) { return Outcome::Success(OtpRateLimit); }
+        if is_loopback(&ip) {
+            return Outcome::Success(OtpRateLimit);
+        }
         match req.rocket().state::<OtpLimiter>() {
             Some(limiter) if limiter.0.check(&ip) => Outcome::Success(OtpRateLimit),
             Some(_) => Outcome::Error((Status::TooManyRequests, ())),

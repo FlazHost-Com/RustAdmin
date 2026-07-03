@@ -1,8 +1,10 @@
 # API — RustAdmin
 
-REST API (JWT, HS256). Base: `/api/v1`. All responses use the envelope
-`{ "success": bool, "message"?, "data"?, "meta"? }`. Errors → same envelope with `success:false`
-and the appropriate HTTP status. Paths are **verbose & symmetric** to web (NOT REST).
+REST API (JWT, HS256). Base: `/api/v1`. All responses use the canonical NodeAdmin envelope
+`{ "status": bool, "message": string, "data"?: object|array|null }`. List endpoints nest
+pagination inside `data`: `{ "datas": [...], "paginate_data": { total_data, current_page,
+page_size, total_page } }`. Errors → same envelope with `status:false` and the appropriate
+HTTP status. Paths are **verbose & symmetric** to web (NOT REST).
 
 ## Auth
 

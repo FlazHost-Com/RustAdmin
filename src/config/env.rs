@@ -26,6 +26,12 @@ pub fn asset(rel: &str) -> PathBuf {
     app_root().join(rel)
 }
 
+/// Storage base path (`STORAGE_BASE_PATH`, default `storage`). Modules must use this
+/// accessor instead of reading the environment directly (checker-enforced).
+pub fn storage_base_path() -> String {
+    get("STORAGE_BASE_PATH", "storage")
+}
+
 /// Application run mode. `Full` = web UI + REST API; `Api` = REST API only (stateless).
 /// Selected at runtime via `APP_MODE` so a single codebase serves both variants.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -185,10 +185,7 @@ pub async fn reset_process(
         .reset_password(db.inner(), &form.email, &form.otp, &form.password)
         .await
     {
-        Ok(_) => Flash::success(
-            Redirect::to(LOGIN),
-            "Reset Password Success.",
-        ),
+        Ok(_) => Flash::success(Redirect::to(LOGIN), "Reset Password Success."),
         Err(e) => Flash::error(
             Redirect::to("/admin/v1/auth/reset/proc"),
             e.message().to_string(),

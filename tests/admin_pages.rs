@@ -47,7 +47,7 @@ async fn admin_pages_render() {
                 "Recent Activities",
                 "Top Products",
                 "Recent Orders",
-                "Active Theme",
+                "Theme Aktif",
             ],
         ),
         (
