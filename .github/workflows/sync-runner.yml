@@ -35,15 +35,15 @@ jobs:
           TOKEN: ${{ steps.apptoken.outputs.token }}
         run: |
           set -euo pipefail
-          git clone --depth 1 "https://x-access-token:${TOKEN}@github.com/flazhost-runner/rustadmin.git" target
+          git clone --depth 1 "https://x-access-token:${TOKEN}@github.com/flazhost-runner/rustadmin.git" "$RUNNER_TEMP/target"
           rsync -a --delete \
             --exclude='.git/' \
             --exclude='/Dockerfile' \
             --exclude='/docker-entrypoint.sh' \
             --exclude='/.dockerignore' \
             --exclude='/.github/' \
-            . target/
-          cd target
+            . "$RUNNER_TEMP/target/"
+          cd "$RUNNER_TEMP/target"
           git add -A
           if git diff --cached --quiet; then
             echo "Tidak ada perubahan kode app — lewati."
