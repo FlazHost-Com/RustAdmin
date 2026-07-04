@@ -1,5 +1,12 @@
 name: Sync app → flazhost-runner
 
+# Setelah CI lolos pada push ke main, sync kode app ke flazhost-runner/rustadmin.
+# File deploy (Dockerfile, docker-entrypoint.sh, .dockerignore, .github/) di-exclude —
+# file-file itu milik flazhost-runner dan tidak akan tertimpa.
+#
+# Prasyarat: secret RUNNER_SYNC_APP_ID + RUNNER_SYNC_APP_KEY (GitHub App) di
+# Settings → Secrets → Actions repo ini (FlazHost-Com/RustAdmin).
+# App harus punya Contents:write ke repo flazhost-runner/rustadmin.
 on:
   workflow_run:
     workflows: ["CI"]
@@ -36,12 +43,14 @@ jobs:
         run: |
           set -euo pipefail
           git clone --depth 1 "https://x-access-token:${TOKEN}@github.com/flazhost-runner/rustadmin.git" "$RUNNER_TEMP/target"
+          # Sync seluruh kode app; file deploy di flazhost-runner TIDAK ditimpa.
           rsync -a --delete \
             --exclude='.git/' \
             --exclude='/Dockerfile' \
             --exclude='/docker-entrypoint.sh' \
             --exclude='/.dockerignore' \
             --exclude='/.github/' \
+            --exclude='/.flazhost/' \
             . "$RUNNER_TEMP/target/"
           cd "$RUNNER_TEMP/target"
           git add -A
