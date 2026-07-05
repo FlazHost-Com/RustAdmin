@@ -38,7 +38,10 @@ async fn landing_renders_bound_to_setting() {
         body.contains("_footer_dark_subscribe_v6_001"),
         "v6 footer present"
     );
-    assert!(body.contains("data-motion"), "motion animation hooks present");
+    assert!(
+        body.contains("data-motion"),
+        "motion animation hooks present"
+    );
 }
 
 #[tokio::test]
